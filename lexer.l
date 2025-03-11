@@ -88,7 +88,7 @@ int line = 1;
 					yylval.castOp = castToInt;
 					return CAST;
 				}
-"scast<float>"			{	
+"cast<float>"			{	
 					
 					yylval.castOp = castToFloat;
 					return CAST;
