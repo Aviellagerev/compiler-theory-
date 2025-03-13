@@ -1,7 +1,9 @@
 %option noyywrap
 %{
 #include <stdio.h>
-#include "symtab.h" 
+#include "symboltab.h" 
+#include "translator.h"
+#include "parser.tab.h" 
 int line = 1;
 %}
 %x COMMENT
@@ -85,12 +87,12 @@ int line = 1;
 
 "cast<int>"			{	
 					
-					yylval.castOp = castToInt;
+					yylval.cast_op = castToInt;
 					return CAST;
 				}
 "cast<float>"			{	
 					
-					yylval.castOp = castToFloat;
+					yylval.cast_op = castToFloat;
 					return CAST;
 				} 
 
@@ -129,3 +131,5 @@ int line = 1;
 . 	    	   	             { fprintf(stderr,"%s unknown token",yytext); }
 
 %%
+
+

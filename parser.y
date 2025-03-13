@@ -2,23 +2,23 @@
 %{
 #include <stdio.h>
 #include <malloc.h>
-#include "symbol_table.h"
+#include "symboltab.h"
 #include "translator.h"
 
 extern int yylex (void);
-int yyerror(char *s);
+int yyerror(const char *s);
 extern int line;
 
 int number = 0;
 int error_number = 0;
-varNode *current_varible = NULL, *next_varible = NULL;
+var_node *current_varible = NULL, *next_varible = NULL;
 command *current_command = NULL;
 command_list *temp_link = NULL;
 char *num = NULL;
 int p = 0;
 char case_val[10] ;
 %}
-%error-verbose
+%define parse.error verbose
 
 %union
 {
@@ -84,7 +84,7 @@ char case_val[10] ;
 %token <op>ADDOP
 %token <num>NUM
 %token <op>MULOP
-%token  <cast_op> CAST
+%token <cast_op> CAST
 %token OR
 %token AND
 %token NOT
@@ -105,7 +105,7 @@ declarations                                       :      declarations  declarat
                                                           |       /*epsilon*/
                                                           ;
 
-declaration                                        :     idlist    ':'  type       { set__varible_type($3);}  ';'   ;
+declaration                                        :     idlist    ':'  type       { set_varible_type($3);}  ';'   ;
                                                                     
 
 type                                                   :       INT {$$ = $1;}
@@ -273,7 +273,7 @@ boolfactor                                          :       NOT  '('  boolexpr  
 						                                    $1.head = floatConvert($1.head, $1.last);
 					                                                    else if($3.type == 'I' && $1.type == 'R')
 						                                    $3.head = floatConvert($3.head, $3.last);
-					                                                    $$.head = addRelopCommand($2, $1.last, $3.last, $1.head, $3.head, typeUpdate($1.type, $3.type));
+					                                                    $$.head = build_relop_command($2, $1.last, $3.last, $1.head, $3.head, typeUpdate($1.type, $3.type));
 					                                                    $$.false = add_new_command_list(NULL, get_last_command($$.head));
 				                                                                  }
                                                           ;
@@ -281,7 +281,7 @@ boolfactor                                          :       NOT  '('  boolexpr  
 expression                                         :       expression  ADDOP  term
                                                                                                                  {				
 					                                   $$.type = typeUpdate($1.type, $3.type);
-					                                   $$.head = addArithmeticCommand($2, $$.type, $$.last, $1.last, $3.last, $1.type, $3.type, $1.head, $3.head);
+					                                   $$.head = build_arithmetic_command ($2, $$.type, $$.last, $1.last, $3.last, $1.type, $3.type, $1.head, $3.head);
 				                                                 }
                                                           |       term
                                                                                                                 {
@@ -294,7 +294,7 @@ expression                                         :       expression  ADDOP  te
 term                                                   :       term  MULOP  factor
                                                                                                       {
 					                         $$.type = typeUpdate($1.type, $3.type);
-					                         $$.head = addArithmeticCommand($2, $$.type, $$.last, $1.last, $3.last, $1.type, $3.type, $1.head, $3.head);
+					                         $$.head = build_arithmetic_command ($2, $$.type, $$.last, $1.last, $3.last, $1.type, $3.type, $1.head, $3.head);
 				                                      }
 
                                                           |       factor
@@ -354,7 +354,7 @@ factor                                                 :       '('  expression  
                                  	
 %%
 
-int yyerror(char *err)
+int yyerror(const  char *err)
 {
 	fprintf(stderr, "ERROR: line %d: %s\n", line,  err);
 	error_number = 1;
