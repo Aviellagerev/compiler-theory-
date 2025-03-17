@@ -82,31 +82,31 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 23 "parser.y"
 
-	struct number {
-		          char value[VARLEN];
-		          char type;
-	                        } num;
+    struct number {
+        char value[VARLEN]; /* Value of a number */
+        char type; /* Type of the number (INT or FLOAT) */
+    } num;
 
-               struct exp {
-		    command *head;
-                                     command_list *false;
-		    char last[VARLEN];
-		    char type;
-	                 } expression;
-	
-	struct bool {
-		       command_list *false;
-		       command *head;
-	                   } boolean;
+    struct exp {
+        command *head; /* Head of the command list for expressions */
+        command_list *false; /* False branch for boolean expressions */
+        char last[VARLEN]; /* Last variable or value in the expression */
+        char type; /* Type of the expression */
+    } expression;
 
-	char id[VARLEN];	
-	char type;
-	char op; 
-                char cast_op;	
-	 command *stmt;	
-	int relop; 
+    struct bool {
+        command_list *false; /* False branch for boolean expressions */
+        command *head; /* Head of the command list for boolean expressions */
+    } boolean;
+
+    char id[VARLEN]; /* Identifier name */
+    char type; /* Type of a variable or expression */
+    char op; /* Arithmetic or logical operator */
+    char cast_op; /* Cast operator */
+    command *stmt; /* Statement command */
+    int relop; /* Relational operator */
 
 #line 112 "parser.tab.h"
 
