@@ -12,7 +12,7 @@ int number = 0; /* Counter for numeric values */
 int error_number = 0; /* Counter for errors */
 var_node *current_varible = NULL, *next_varible = NULL; /* Variables for symbol table */
 command *current_command = NULL; /* Current command in the command list */
-command_list *temp_link = NULL; /* Temporary link for command lists  for jmp*/
+command_list *temp_link = NULL; /* Temporary link for command lists */
 char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
@@ -63,7 +63,7 @@ char case_val[10]; /* Array to store case values */
 %type <stmt> if_stmt /* If statement */
 %type <stmt> break_stmt /* Break statement */
 %type <stmt> switch_stmt /* Switch statement */
-%type <stmt> stmt_block /* Block of statements */
+%type <stmt> stmt_block /* Block of statements */   
 %type <stmt> while_stmt /* While statement */
 %type <stmt> stmtlist /* List of statements */
 %type <stmt> caselist /* List of cases in a switch statement */
@@ -154,11 +154,13 @@ output_stmt: OUTPUT '(' expression ')' ';'
 if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
 {
     /* Merge the boolean expression and statements for the if-else construct */
+    /*if->bool->smnt if false */
+    /*uses temp list to add later the jump line */
     $$ = merege_comand($3.head, $5);
     $$ = translate_comand($$, 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command($$));
     $$ = add_label($$);
-    updateList($3.false, get_last_command($$));
+    updateList($3.false, get_last_command($$));/*here is the continue for false update the jump */
     $$ = merege_comand($$, $7);
     $$ = add_label($$);
     updateList(temp_link, get_last_command($$));
@@ -182,7 +184,7 @@ while_stmt: WHILE '(' boolexpr ')' stmt
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
     /* Generate commands for the switch statement */
-    next_varible = createTempVar(current_varible->type);
+    next_varible = add_temp_var(current_varible->type);
     current_command = translate_comand(current_command, 'J', "MPZ", "", next_varible->name, "");
     $3.head = merege_comand(current_command, $3.head);
     temp_link = add_new_command_list(NULL, get_last_command($3.head));
@@ -207,7 +209,7 @@ caselist: caselist CASE NUM ':' stmtlist
     num = $3.value;
     case_val[p] = *num;
     p++;
-    next_varible = createTempVar(current_varible->type);
+    next_varible = add_temp_var(current_varible->type);
     $$ = translate_comand($$, current_varible->type, "EQL", current_varible->name, next_varible->name, num);
     $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");
     temp_link = add_new_command_list(NULL, get_last_command($$));
@@ -282,7 +284,7 @@ boolfactor: NOT '(' boolexpr ')'
     else if ($3.type == 'I' && $1.type == 'R')
         $3.head = floatConvert($3.head, $3.last);
     $$.head = build_relop_command($2, $1.last, $3.last, $1.head, $3.head, typeUpdate($1.type, $3.type));
-    $$.false = add_new_command_list(NULL, get_last_command($$.head));
+    $$.false = add_new_command_list(NULL, get_last_command($$.head));/*update the line number for the jump*/
 }
 ;
 

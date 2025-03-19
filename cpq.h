@@ -39,10 +39,10 @@ FILE* quadFile;/*QUAD file*/
 
 /*Error messages*/
  errMsg messages[] = {
-					{"ERROR: cannot open file\n",&ERR0},                              /*message 0*/
-					{"ERROR: missing arguments\n",&ERR1},                             /*message 1*/
-					{"ERROR: parser error\n",&ERR2},                                  /*message 2*/
-					{"ERROR: extension error, must be \".ou\"\n",&ERR3},              /*message 3*/
+					{"ERROR: cannot open file\n",&ERR0},                            
+					{"ERROR: missing arguments\n",&ERR1},                          
+					{"ERROR: parser error\n",&ERR2},                                 
+					{"ERROR: extension error, must be \".ou\"\n",&ERR3},              
 };
 
 FILE* openFile(char* name, char* type);/*Open file function*/

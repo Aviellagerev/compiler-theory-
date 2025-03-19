@@ -1611,7 +1611,7 @@ yyreduce:
 #line 183 "parser.y"
 {
     /* Generate commands for the switch statement */
-    next_varible = createTempVar(current_varible->type);
+    next_varible = add_temp_var(current_varible->type);
     current_command = translate_comand(current_command, 'J', "MPZ", "", next_varible->name, "");
     (yyvsp[-7].expression).head = merege_comand(current_command, (yyvsp[-7].expression).head);
     temp_link = add_new_command_list(NULL, get_last_command((yyvsp[-7].expression).head));
@@ -1638,7 +1638,7 @@ yyreduce:
     num = (yyvsp[-2].num).value;
     case_val[p] = *num;
     p++;
-    next_varible = createTempVar(current_varible->type);
+    next_varible = add_temp_var(current_varible->type);
     (yyval.stmt) = translate_comand((yyval.stmt), current_varible->type, "EQL", current_varible->name, next_varible->name, num);
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "MPZ", "", next_varible->name, "");
     temp_link = add_new_command_list(NULL, get_last_command((yyval.stmt)));

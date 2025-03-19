@@ -14,6 +14,7 @@ typedef char chars[CHAR];
 typedef char strings[STR];
 
 
+
 /*Definition of two errors messages*/
 genErrors GENERR0, GENERR1;
 
@@ -27,7 +28,7 @@ strings STR0, STR1, STR2, STR3, STR4, STR5, STR6, STR7, STR8, STR9, STR10, STR11
 and pointer to his address in memory that save place array of 100 index's*/
 typedef struct
 {
-	char charCmd;
+	char  charCmd;
 	chars* charAddress;
 }charCmd;
 
@@ -35,7 +36,7 @@ typedef struct
 and pointer to his address in memory that save place array of 100 index's*/
 typedef struct
 {
-	char* stringCmd;
+	char* stringCmd; 
 	strings* strAddress;
 }strCmd;
 
@@ -50,24 +51,25 @@ typedef struct
 /*Error messages*/
 errGenMsg genMessages[] = {
 				   {"ERROR: unknown variable, not defined in the symbol table\n",&GENERR0},       /*message 0*/
-				   {"ERROR: illegal assignment, from float to integer\n",&GENERR1},               /*message 1*/
+				   {"cast from float to int ERROR!  \n",&GENERR1},               /*message 1*/
 				                                                        
 };
-
+/*to no rewrite for float and int i gave same command and a type so that
+i can just write each case togther insted of seprate */
 /*Chars*/
 charCmd genChars[] = {
-				   {'I',&CHAR0},               /*char 0*/
-				   {'R',&CHAR1},              /*char 1*/
-				   {'N',&CHAR2},              /*char 2 */
-				   {'E',&CHAR3},              /*char 3*/
-				   {'*',&CHAR4},              /*char 4*/
+				   {'I',&CHAR0},               /* int*/
+				   {'R',&CHAR1},              /*float(real) 1*/
+				   {'N',&CHAR2},              /*not */
+				   {'E',&CHAR3},              /*equal 3*/
+				   {'*',&CHAR4},              /*temp number to add label can be deleted and changed  */
 				   {'J',&CHAR5}              /*char 5*/
 };
-
+/*check to change the jmpz from mpz  */
 /*Strings*/
-strCmd genStrings[] = {
-				   {"",&STR0},               /*string 0*/
-				   {"1",&STR1},              /*string 1*/
+strCmd genStrings[] = {/*delete getStrings[0] change eachse genStrings[i] to genStrings[i-1] */
+				  {"",&STR0},               /*string 0* can be deleted*/
+				   {"1",&STR1},              /*string 1 this is to check if junp or not ususally change it no needed */
 				   {"TOR",&STR2},              /*string 2 */
 				   {"ASN",&STR3},              /*string 3*/
 				   {"TOI",&STR4},              /*string 4*/
@@ -146,7 +148,7 @@ command *translate_comand(command *head, char type, char *com, char *firstArg, c
 {
 	command *newCommand, *prevCommand;
 
-  if( !head )
+	   if( !head )
 	{
 		head = (command *)malloc(sizeof(command));
 		newCommand = head;
@@ -172,9 +174,11 @@ command* add_assign_commadn(char* var, char* exp, char expType, command* expHead
 	var_node* symbol = NULL;
 	command* head = NULL;
 	free_state(exp);
-	if (!(symbol = search_varible(var)))
-		printf("%s",genMessages[0].genString);
-	else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)
+
+	/*check exsist -> check cast -> assign  */
+	if (!(symbol = search_varible(var))) /*check exsistence of varible (called before) */
+		printf("%s",genMessages[0].genString);/*print error*/
+	else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)/*check types of */
 		printf("%s",genMessages[1].genString);
 	else
 	{
@@ -201,7 +205,7 @@ command* build_arithmetic_command (char op, char type, char* last, char* firstAr
 	free_state(firstArgLast);
 	free_state(secondArgLast);
 	head = merege_comand(firstHead, secondHead);
-	symbol = createTempVar(type);
+	symbol = add_temp_var(type);
 	strcpy(last, symbol->name);
 	return build_math_operator_command (op, head, type, symbol->name, firstArgLast, secondArgLast);
 
@@ -233,7 +237,7 @@ command* build_relop_command (int relopType, char* firstVar, char* secondVar, co
 	head = merege_comand(firstHead, secondHead);
 	free_state(firstVar);
 	free_state(secondVar);
-	var = createTempVar(genChars[0].charCmd);
+	var = add_temp_var(genChars[0].charCmd);/*generate var for use if needed */
 	switch (relopType)
 	{
 	case equal:
@@ -265,26 +269,20 @@ command* build_relop_command (int relopType, char* firstVar, char* secondVar, co
 /*Accepts pointer to head command and temp variable.If command smaller or equal
 	program do reverse and to do command bigger and then doing -1 so we accepts 
 	reverse command smaller or equal what we need*/
-command* flip_command (command* head, char* lastVar)
-{
-	command* last = NULL;
-
-	last = get_last_command(head);
-	if (!strcmp(last->com + 1, genStrings[9].stringCmd))
-	{
-		*((last->com) + 1) = genChars[2].charCmd;
+	command* flip_command(command* head, char* lastVar) {
+		command* last = get_last_command(head);	
+		if (!strcmp(last->com + 1, genStrings[9].stringCmd)) { // EQL (==)
+			*((last->com) + 1) = genChars[2].charCmd; // Change to NQL (!=)
+		}
+		else if (!strcmp(last->com + 1, genStrings[10].stringCmd)) { // NQL (!=)
+			*((last->com) + 1) = genChars[3].charCmd; // Change to EQL (==)
+		}
+		else { // For >= or <=
+			head = translate_comand(head, genChars[0].charCmd, genStrings[6].stringCmd, lastVar, genStrings[1].stringCmd, lastVar);
+		}
+	
+		return head;
 	}
-	else if (!strcmp(last->com + 1, genStrings[10].stringCmd))
-	{
-		*((last->com) + 1) = genChars[3].charCmd;
-	}
-	else
-	{
-		head = translate_comand(head, genChars[0].charCmd, genStrings[6].stringCmd, lastVar, genStrings[1].stringCmd, lastVar);
-	}
-	return head;
-}
-
 /*Accepts pointer to head of command and create ladel and
 	return pointer to command with created label*/
 command *add_label(command *head)
@@ -302,7 +300,7 @@ command* floatConvert(command* head, char* last)
 {
 	var_node* commandName;
 
-	commandName = createTempVar(genChars[1].charCmd);
+	commandName = add_temp_var(genChars[1].charCmd);
 	head = translate_comand(head, genChars[0].charCmd, genStrings[2].stringCmd, commandName->name, last, genStrings[0].stringCmd);
 	free_state(last);
 	strcpy(last, commandName->name);
@@ -315,7 +313,7 @@ command* intConvert(command* head, char* last)
 {
 	var_node* commandName;
 
-	commandName = createTempVar(genChars[0].charCmd);
+	commandName = add_temp_var(genChars[0].charCmd);
 	head = translate_comand(head, genChars[1].charCmd, genStrings[4].stringCmd, commandName->name, last, genStrings[0].stringCmd);
 	free_state(last);
 	strcpy(last, commandName->name);
@@ -390,7 +388,7 @@ void command_print(command* head)
 	}
 	while (head)
 	{
-		if (*(head->com) != genChars[4].charCmd)
+		if (*(head->com) != genChars[4].charCmd) 
 		{
 			if (*(head->firstArg) == genChars[4].charCmd)
 				sprintf(head->firstArg, "%d", lables[atoi(1 + head->firstArg)]);

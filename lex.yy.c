@@ -975,7 +975,7 @@ YY_RULE_SETUP
 #line 55 "lexer.l"
 { 
                      strncpy(yylval.num.value, yytext, VARLEN);
-                     yylval.num.type = 'R';
+                     yylval.num.type = 'R';/*assigned as float (real number ) */
                      return NUM;
                    }
 	YY_BREAK
@@ -984,7 +984,7 @@ YY_RULE_SETUP
 #line 60 "lexer.l"
 { 
                      strncpy(yylval.num.value, yytext, VARLEN);
-                     yylval.num.type = 'I';
+                     yylval.num.type = 'I'; /*assignet as int*/
                      return NUM;
                    }
 	YY_BREAK

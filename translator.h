@@ -1,5 +1,5 @@
-#ifndef GEN_H
-#define GEN_H
+#ifndef TRANSLATOR_H
+#define TRANSLATOR_H
 
 #include <stdio.h>
 #include <stdlib.h>

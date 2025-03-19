@@ -54,12 +54,12 @@ int line = 1;
 
 [0-9]+"."[0-9]*    { 
                      strncpy(yylval.num.value, yytext, VARLEN);
-                     yylval.num.type = 'R';
+                     yylval.num.type = 'R';/*assigned as float (real number ) */
                      return NUM;
                    }
 [0-9]+             { 
                      strncpy(yylval.num.value, yytext, VARLEN);
-                     yylval.num.type = 'I';
+                     yylval.num.type = 'I'; /*assignet as int*/
                      return NUM;
                    }
 

@@ -1,81 +1,85 @@
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#ifndef SYMBOLTAB_H
+#define SYMBOLTAB_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/*length of variable*/
-#define VARLEN 20
+#define VARLEN 32 // Maximum length of a variable name
 
-/*States of variables:
-FREE - variable not in use
-SAVE - variable not in use but it will be in use
-LOCK - variable in use*/
-enum { FREE , SAVE , LOCK };
+// States for a variable
+#define FREE 0 // Variable is free and can be reused
+#define SAVE 1 // Variable is in use
+#define LOCK 2 // Variable is locked (in use)
 
-/*Type definition of struct symbol table that have variables.Every varible have a state
-that say if we can use this variable or not.Data Structure of symbol table is 
-search binary tree that give a simple search of variable what we need*/
-typedef struct node{
-	char name[VARLEN];
-	char type;
-	int state;
-	int flag ;
-	struct node *left;
-	struct node *right;
+
+/*@brief Node structure for the binary search tree*/
+typedef struct var_node {
+    char name[VARLEN]; // Name of the variable
+    char type;         // Type of the variable (e.g., 'i' for integer, 'f' for float)
+    int state;         // State of the variable (FREE, SAVE, or LOCK)
+    int flag;          // Flag to indicate if the variable has a type (1 = has type, 0 = no type)
+    struct var_node *left;  // Pointer to the left child
+    struct var_node *right; // Pointer to the right child
 } var_node;
 
-/*Accepts type it can be float or integer and
-create temporary variable like t1,t2...,return 
-pointer to node in tree with new temporary variable*/
-var_node *createTempVar(char);
+/* @brief Creates a temporary variable of the specified type.
+   @param type The type of the variable to create.
+   @return A pointer to the node representing the temporary variable. */
+var_node* add_temp_var(char type);
 
-/*Accepts name and type and add temporary variabele
-to binary search tree or in other words to symbol table,
-return pointer to node in tree with new temporary variable.*/
-var_node *addTempVar(char*, char);
+/* @brief Adds a temporary variable with the given name and type to the symbol table.
+   @param name The name of the variable.
+   @param type The type of the variable.
+   @return A pointer to the newly created node. */
+var_node* set_temp_var(char* name, char type);
 
-/*Accepts name  and add  variable to binary search tree
-without type or in other words to symbol table,
-return pointer to node in tree with new variable without type.*/
-var_node *addVarName(char*);
+/* @brief Adds a variable with the given name to the symbol table.
+   @param name The name of the variable.
+   @return A pointer to the newly created node. */
+var_node* add_var_name(char* name);
 
-/*Accepts type  and tree and add to all variables without
-type in binary search tree type which function accept,
-return pointer to node in tree to variable with type was added.*/
-var_node *addVarType(char, var_node*);
+/* @brief Recursively assigns the specified type to all untyped variables in the symbol table.
+   @param type The type to assign.
+   @param curr The current node in the BST.
+   @return A pointer to the current node. */
+var_node* addVarType(char type, var_node* curr);
 
-/*Accepts name  and add  variable to binary search tree
-without type or in other words to symbol table.*/
-void set_varible_name(char*);
+/* @brief Adds a variable with the given name to the symbol table if it does not already exist.
+   @param name The name of the variable.
+   @note Prints an error message if the variable name is a duplicate. */
+void set_varible_name(char* name);
 
-/*Accepts type  and tree and add to all variables without
-type in binary search tree type which function accept.*/
-void set_varible_type(char);
+/* @brief Assigns the specified type to all untyped variables in the symbol table.
+   @param type The type to assign. */
+void set_varible_type(char type);
 
-/*Accepts name and search this name in binary search tree
-or in other words in symbol table,return pointer to node with
-this variable name or if not exist null.*/
-var_node *search_varible(char*);
+/* @brief Searches for a variable by name in the symbol table.
+   @param name The name of the variable to search for.
+   @return A pointer to the node if found, otherwise NULL. */
+var_node* search_varible(char* name);
 
-/*Accepts type and pointer to the tree and search variable
-with this type and state FREE in the tree pointer to node with
-this variable if not found return null */
-var_node *search_free_var(char, var_node*);
+/* @brief Recursively searches for a free variable of the specified type.
+   @param type The type of the variable to search for.
+   @param curr The current node in the BST.
+   @return A pointer to the node if found, otherwise NULL. */
+var_node* search_free_var(char type, var_node* curr);
 
-/*Accepts name and pointer to the tree and search location
-for new variable and return pointer to this node where
-will be this variable. */
-var_node *searchLocation(char*, var_node*);
+/* @brief Finds the correct location in the symbol table to insert a new variable.
+   @param name The name of the variable to insert.
+   @param curr The current node in the BST.
+   @return A pointer to the parent node where the new variable should be inserted. */
+var_node* searchLocation(char* name, var_node* curr);
 
-/*Accepts name of variable and him to state FREE*/
-void free_state(char*);
+/* @brief Marks a variable as free if it exists and is currently in use.
+   @param name The name of the variable to free. */
+void free_state(char* name);
 
-/*Accept pointer to node and free this node*/
-void freeVar(var_node*);
+/* @brief Recursively frees all nodes in the symbol table starting from the given node.
+   @param curr The current node to free. */
+void free_var(var_node* curr);
 
-/*Free all tree of vaiables*/
+/* @brief Frees the entire symbol table by deallocating all nodes. */
 void free_tree();
 
-#endif
+#endif // SYMBOLTAB_H

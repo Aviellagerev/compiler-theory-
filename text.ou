@@ -1,11 +1,10 @@
-a, b: float;
+a, b: int;
 
 {
-    input(a);
-    input(b);
-    if(a<b)
-output(a);
-    else
-output(b);
-
+ input(a);
+ input(b);
+ if (a < b)
+ output(a);
+ else
+ output(b);
 }
