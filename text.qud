@@ -1,8 +1,15 @@
-IINP	a		
-IINP	b		
-ILSS	var1	a	b
-JMPZ	7	var1	
-IPRT	a		
-JUMP	8		
-IPRT	b		
+IINP	cond		
+IEQL	var4	cond	1
+JMPZ	6	var4	
+IPRT	1		
+JUMP	15		
+IEQL	var2	cond	2
+JMPZ	10	var2	
+IPRT	2		
+JUMP	15		
+IEQL	var3	cond	3
+JMPZ	14	var3	
+IPRT	3		
+JUMP	15				
+IPRT	0		
 HALT			

@@ -180,7 +180,6 @@ while_stmt: WHILE '(' boolexpr ')' stmt
     updateList($3.false, get_last_command($$));
 }
 ;
-
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
     /* Generate commands for the switch statement */
@@ -191,6 +190,7 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
     $3.head = add_label($3.head);
     updateList(temp_link, get_last_command($3.head));
     current_command = NULL;
+    
     *num = case_val[0];
     current_command = translate_comand(current_command, current_varible->type, "EQL", current_varible->name, next_varible->name, num);
     $3.head = merege_comand(current_command, $3.head);
@@ -210,8 +210,8 @@ caselist: caselist CASE NUM ':' stmtlist
     case_val[p] = *num;
     p++;
     next_varible = add_temp_var(current_varible->type);
-    $$ = translate_comand($$, current_varible->type, "EQL", current_varible->name, next_varible->name, num);
-    $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");
+    $$ = translate_comand($$, current_varible->type, "EQL", current_varible->name, next_varible->name, num);//problem here 
+    $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");//and here test why the pointer is weird
     temp_link = add_new_command_list(NULL, get_last_command($$));
     $$ = add_label($$);
     updateList(temp_link, get_last_command($$));
