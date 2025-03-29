@@ -7,7 +7,7 @@
 extern int yylex (void);
 int yyerror(const char *s);
 extern int line;
-
+command_list *case_jumps = NULL; /* For tracking all case jumps */
 int number = 0; /* Counter for numeric values */
 int error_number = 0; /* Counter for errors */
 var_node *current_varible = NULL, *next_varible = NULL; /* Variables for symbol table */
@@ -182,47 +182,63 @@ while_stmt: WHILE '(' boolexpr ')' stmt
 ;
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
-    /* Generate commands for the switch statement */
+   // Generate temporary for switch expression
+  // Generate temporary for switch expression
     next_varible = add_temp_var(current_varible->type);
-    current_command = translate_comand(current_command, 'J', "MPZ", "", next_varible->name, "");
-    $3.head = merege_comand(current_command, $3.head);
-    temp_link = add_new_command_list(NULL, get_last_command($3.head));
-    $3.head = add_label($3.head);
-    updateList(temp_link, get_last_command($3.head));
-    current_command = NULL;
     
-    *num = case_val[0];
-    current_command = translate_comand(current_command, current_varible->type, "EQL", next_varible->name, current_varible->name, num);
-    $3.head = merege_comand(current_command, $3.head);
-    $$ = merege_comand($3.head, $6);
-    $$ = translate_comand($$, 'J', "UMP", "", "", "");
-    temp_link = add_new_command_list(NULL, get_last_command($$));
-    $$ = merege_comand($$, $9);
-    $$ = add_label($$);
-    updateList(temp_link, get_last_command($$));
+    // Start with case comparisons
+    $3.head = merege_comand($3.head, $6);
+    
+    // Add jump to default case
+    $3.head = translate_comand($3.head, 'J', "UMP", "", "", "");
+    temp_link = add_new_command_list(NULL, get_last_command($3.head));
+    
+    // Add default label
+    $3.head = add_label($3.head);
+    
+    // Add default case code
+    $3.head = merege_comand($3.head, $9);
+    
+    // Add end label
+    $3.head = add_label($3.head);
+    
+    // Update all jumps (both case jumps and the initial default jump)
+    updateList(temp_link, get_last_command($3.head));
+    updateList(case_jumps, get_last_command($3.head));
+    
+    // Clean up
+    case_jumps = NULL;
+    $$ = $3.head;
 }
 ;
 
 caselist: caselist CASE NUM ':' stmtlist
 {
-    /* Generate commands for each case in the switch statement */
+    // Generate comparison
     num = $3.value;
-    case_val[p] = *num;
-    p++;
     next_varible = add_temp_var(current_varible->type);
-    $$ = translate_comand($$, current_varible->type, "EQL", next_varible->name, current_varible->name, num);//problem here 
-    $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");//and here test why the pointer is weird
+    $$ = translate_comand($1, current_varible->type, "EQL", next_varible->name, current_varible->name, num);
+    
+    // Generate conditional jump to next case
+    $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");
     temp_link = add_new_command_list(NULL, get_last_command($$));
-    $$ = add_label($$);
-    updateList(temp_link, get_last_command($$));
-    $$ = merege_comand($1, $5);
+    
+    // Add case body
+    $$ = merege_comand($$, $5);
+    
+    // Add unconditional jump to end of switch
     $$ = translate_comand($$, 'J', "UMP", "", "", "");
-    temp_link = add_new_command_list(NULL, get_last_command($$));
+    case_jumps = add_new_command_list(case_jumps, get_last_command($$));
+    
+    // Add label for next case
     $$ = add_label($$);
     updateList(temp_link, get_last_command($$));
 }
-| /*empty*/ { $$ = NULL; } /* Empty case list */
-;
+| /* empty */ 
+{ 
+    $$ = NULL; 
+    case_jumps = NULL; 
+}
 
 break_stmt: BREAK ';' { $$ = NULL; } /* Break statement */
 ;

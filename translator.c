@@ -308,7 +308,7 @@
 		command to float command and return and converted command*/
 	command* floatConvert(command* head, char* last)
 	{
-		var_node* commandName;
+	 		var_node* commandName;
 
 		commandName = add_temp_var(genChars[1].charCmd);
 		head = translate_comand(head, genChars[0].charCmd, genStrings[1].stringCmd, commandName->name, last, " ");
