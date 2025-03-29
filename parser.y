@@ -192,7 +192,7 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
     current_command = NULL;
     
     *num = case_val[0];
-    current_command = translate_comand(current_command, current_varible->type, "EQL", current_varible->name, next_varible->name, num);
+    current_command = translate_comand(current_command, current_varible->type, "EQL", next_varible->name, current_varible->name, num);
     $3.head = merege_comand(current_command, $3.head);
     $$ = merege_comand($3.head, $6);
     $$ = translate_comand($$, 'J', "UMP", "", "", "");
@@ -210,7 +210,7 @@ caselist: caselist CASE NUM ':' stmtlist
     case_val[p] = *num;
     p++;
     next_varible = add_temp_var(current_varible->type);
-    $$ = translate_comand($$, current_varible->type, "EQL", current_varible->name, next_varible->name, num);//problem here 
+    $$ = translate_comand($$, current_varible->type, "EQL", next_varible->name, current_varible->name, num);//problem here 
     $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");//and here test why the pointer is weird
     temp_link = add_new_command_list(NULL, get_last_command($$));
     $$ = add_label($$);

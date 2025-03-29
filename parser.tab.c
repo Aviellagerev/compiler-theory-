@@ -559,9 +559,9 @@ static const yytype_int16 yyrline[] =
 {
        0,    93,    93,   103,   104,   107,   107,   110,   111,   114,
      115,   118,   119,   120,   121,   122,   123,   124,   125,   128,
-     135,   146,   154,   170,   184,   207,   225,   228,   231,   234,
-     235,   238,   250,   258,   264,   272,   280,   292,   298,   307,
-     313,   322,   329,   345,   357
+     135,   146,   154,   170,   183,   206,   224,   227,   230,   233,
+     234,   237,   249,   257,   263,   271,   279,   291,   297,   306,
+     312,   321,   328,   344,   356
 };
 #endif
 
@@ -1610,7 +1610,7 @@ yyreduce:
     break;
 
   case 24: /* switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'  */
-#line 185 "parser.y"
+#line 184 "parser.y"
 {
     /* Generate commands for the switch statement */
     next_varible = add_temp_var(current_varible->type);
@@ -1622,7 +1622,7 @@ yyreduce:
     current_command = NULL;
     
     *num = case_val[0];
-    current_command = translate_comand(current_command, current_varible->type, "EQL", current_varible->name, next_varible->name, num);
+    current_command = translate_comand(current_command, current_varible->type, "EQL", next_varible->name, current_varible->name, num);
     (yyvsp[-7].expression).head = merege_comand(current_command, (yyvsp[-7].expression).head);
     (yyval.stmt) = merege_comand((yyvsp[-7].expression).head, (yyvsp[-4].stmt));
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "UMP", "", "", "");
@@ -1635,14 +1635,14 @@ yyreduce:
     break;
 
   case 25: /* caselist: caselist CASE NUM ':' stmtlist  */
-#line 208 "parser.y"
+#line 207 "parser.y"
 {
     /* Generate commands for each case in the switch statement */
     num = (yyvsp[-2].num).value;
     case_val[p] = *num;
     p++;
     next_varible = add_temp_var(current_varible->type);
-    (yyval.stmt) = translate_comand((yyval.stmt), current_varible->type, "EQL", current_varible->name, next_varible->name, num);//problem here 
+    (yyval.stmt) = translate_comand((yyval.stmt), current_varible->type, "EQL", next_varible->name, current_varible->name, num);//problem here 
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "MPZ", "", next_varible->name, "");//and here test why the pointer is weird
     temp_link = add_new_command_list(NULL, get_last_command((yyval.stmt)));
     (yyval.stmt) = add_label((yyval.stmt));
@@ -1657,37 +1657,37 @@ yyreduce:
     break;
 
   case 26: /* caselist: %empty  */
-#line 225 "parser.y"
+#line 224 "parser.y"
             { (yyval.stmt) = NULL; }
 #line 1663 "parser.tab.c"
     break;
 
   case 27: /* break_stmt: BREAK ';'  */
-#line 228 "parser.y"
+#line 227 "parser.y"
                       { (yyval.stmt) = NULL; }
 #line 1669 "parser.tab.c"
     break;
 
   case 28: /* stmt_block: '{' stmtlist '}'  */
-#line 231 "parser.y"
+#line 230 "parser.y"
                              { (yyval.stmt) = (yyvsp[-1].stmt); }
 #line 1675 "parser.tab.c"
     break;
 
   case 29: /* stmtlist: stmtlist stmt  */
-#line 234 "parser.y"
+#line 233 "parser.y"
                         { (yyval.stmt) = merege_comand((yyvsp[-1].stmt), (yyvsp[0].stmt)); }
 #line 1681 "parser.tab.c"
     break;
 
   case 30: /* stmtlist: %empty  */
-#line 235 "parser.y"
+#line 234 "parser.y"
             { (yyval.stmt) = NULL; }
 #line 1687 "parser.tab.c"
     break;
 
   case 31: /* boolexpr: boolexpr OR boolterm  */
-#line 239 "parser.y"
+#line 238 "parser.y"
 {
     /* Generate commands for logical OR */
     (yyval.boolean).head = translate_comand((yyvsp[-2].boolean).head, 'J', "UMP", "", "", "");
@@ -1703,7 +1703,7 @@ yyreduce:
     break;
 
   case 32: /* boolexpr: boolterm  */
-#line 251 "parser.y"
+#line 250 "parser.y"
 {
     /* Boolean term */
     (yyval.boolean).head = (yyvsp[0].boolean).head;
@@ -1713,7 +1713,7 @@ yyreduce:
     break;
 
   case 33: /* boolterm: boolterm AND boolfactor  */
-#line 259 "parser.y"
+#line 258 "parser.y"
 {
     /* Generate commands for logical AND */
     (yyval.boolean).head = merege_comand((yyvsp[-2].boolean).head, (yyvsp[0].boolean).head);
@@ -1723,7 +1723,7 @@ yyreduce:
     break;
 
   case 34: /* boolterm: boolfactor  */
-#line 265 "parser.y"
+#line 264 "parser.y"
 {
     /* Boolean factor */
     (yyval.boolean).false = (yyvsp[0].boolean).false;
@@ -1733,7 +1733,7 @@ yyreduce:
     break;
 
   case 35: /* boolfactor: NOT '(' boolexpr ')'  */
-#line 273 "parser.y"
+#line 272 "parser.y"
 {
     /* Generate commands for logical NOT */
     (yyval.boolean).head = translate_comand((yyvsp[-1].boolean).head, 'J', "UMP", "", "", "");
@@ -1745,7 +1745,7 @@ yyreduce:
     break;
 
   case 36: /* boolfactor: expression RELOP expression  */
-#line 281 "parser.y"
+#line 280 "parser.y"
 {
     /* Generate commands for relational operators */
     if ((yyvsp[-2].expression).type == 'I' && (yyvsp[0].expression).type == 'R')
@@ -1759,7 +1759,7 @@ yyreduce:
     break;
 
   case 37: /* expression: expression ADDOP term  */
-#line 293 "parser.y"
+#line 292 "parser.y"
 {
     /* Generate commands for addition/subtraction */
     (yyval.expression).type = typeUpdate((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
@@ -1769,7 +1769,7 @@ yyreduce:
     break;
 
   case 38: /* expression: term  */
-#line 299 "parser.y"
+#line 298 "parser.y"
 {
     /* Term in an expression */
     (yyval.expression).type = (yyvsp[0].expression).type;
@@ -1780,7 +1780,7 @@ yyreduce:
     break;
 
   case 39: /* term: term MULOP factor  */
-#line 308 "parser.y"
+#line 307 "parser.y"
 {
     /* Generate commands for multiplication/division */
     (yyval.expression).type = typeUpdate((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
@@ -1790,7 +1790,7 @@ yyreduce:
     break;
 
   case 40: /* term: factor  */
-#line 314 "parser.y"
+#line 313 "parser.y"
 {
     /* Factor in a term */
     (yyval.expression).type = (yyvsp[0].expression).type;
@@ -1801,7 +1801,7 @@ yyreduce:
     break;
 
   case 41: /* factor: '(' expression ')'  */
-#line 323 "parser.y"
+#line 322 "parser.y"
 {
     /* Parenthesized expression */
     (yyval.expression).type = (yyvsp[-1].expression).type;
@@ -1812,7 +1812,7 @@ yyreduce:
     break;
 
   case 42: /* factor: CAST '(' expression ')'  */
-#line 330 "parser.y"
+#line 329 "parser.y"
 {
     /* Cast expression */
     number = cast((yyvsp[-3].cast_op));
@@ -1832,7 +1832,7 @@ yyreduce:
     break;
 
   case 43: /* factor: ID  */
-#line 346 "parser.y"
+#line 345 "parser.y"
 {
     /* Identifier */
     (yyval.expression).head = NULL;
@@ -1848,7 +1848,7 @@ yyreduce:
     break;
 
   case 44: /* factor: NUM  */
-#line 358 "parser.y"
+#line 357 "parser.y"
 {
     /* Numeric value */
     strcpy((yyval.expression).last, (yyvsp[0].num).value);
@@ -2083,7 +2083,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 366 "parser.y"
+#line 365 "parser.y"
 
 
 int yyerror(const char *err)

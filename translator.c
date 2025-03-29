@@ -146,7 +146,14 @@
 	command list and return pointer to head of this command*/
 	command *translate_comand(command *head, char type, char *com, char *firstArg, char* secondArg, char *thirdArg)
 	{
-		printf("head:%s    :number %s\n", (char *)head,thirdArg);
+		// if(strcmp(com, "MPZ") == 0||strcmp(com, "UMP") == 0){{
+			
+		// 	printf("Type: %c\n", type);
+		// 	printf("Command: %s\n", com);
+		// 	printf("First argument: %s\n", firstArg ? firstArg : "NULL");
+		// 	printf("Second argument: %s\n", secondArg ? secondArg : "NULL");
+		// 	printf("Third argument: %s\n", thirdArg ? thirdArg : "NULL");
+		// }}
 		command *newCommand, *prevCommand;
 
 		if( !head )
@@ -228,11 +235,13 @@
 			return translate_comand(head, type, genStrings[7].stringCmd, firstArg, secondArg, thirdArg);
 		}
 	}
-
+	
 	/*Accepts data of relop command and create quad command that add to
 	command list and return pointer to head of this command*/
 	command* build_relop_command (int relopType, char* firstVar, char* secondVar, command* firstHead, command* secondHead, char compareType)
 	{
+					
+		printf("buld relpo !!");
 		command* head;
 		var_node* var;
 		head = merege_comand(firstHead, secondHead);
@@ -289,7 +298,7 @@
 	command *add_label(command *head)
 	{
 		char buffer[ARGLEN];
-		
+		printf("adds label\n");
 		labelsCount++;
 		sprintf(buffer, "%d", labelsCount); /*itoa here using sprintf*/
 		return translate_comand(head,genChars[4].charCmd, buffer, " ", " ", " ");
