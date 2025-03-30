@@ -88,7 +88,7 @@
 
 	/*Accepts two pointers to heads of command lists
 	and merged them and return merged command list*/
-	command_list* mergeLists(command_list* head, command_list* tail)
+	command_list* merge_comnd_list(command_list* head, command_list* tail)
 	{
 		command_list* last = head;
 
@@ -104,7 +104,7 @@
 	merged them and return merged command list with this row command*/
 	command_list* add_new_command_list(command_list* list, command* com)
 	{
-		command_list* prevCommand;
+		command_list* previous_comnd;
 
 		if (!list)
 		{
@@ -113,22 +113,22 @@
 			list->com = com;
 			return list;
 		}
-		prevCommand = (command_list*)malloc(sizeof(command_list));
-		prevCommand->next = list;
-		prevCommand->com = com;
-		return prevCommand;
+		previous_comnd = (command_list*)malloc(sizeof(command_list));
+		previous_comnd->next = list;
+		previous_comnd->com = com;
+		return previous_comnd;
 	}
 
 	/*Accepts pointers two heads commands and merged them and
 	return merged command */
 	command* merege_comand(command* head, command* tail)
 	{
-		command* lastCommand;
+		command* last_comnd;
 
 		if (!head)
 			return tail;
-		lastCommand = get_last_command(head);
-		lastCommand->next = tail;
+		last_comnd = get_last_command(head);
+		last_comnd->next = tail;
 		return head;
 	}
 
@@ -136,10 +136,10 @@
 	return last element of command */
 	command *get_last_command(command *head)
 	{
-		command *lastCommand = head;
-		while(lastCommand->next)
-			lastCommand = lastCommand->next;
-		return lastCommand;
+		command *last_comnd = head;
+		while(last_comnd->next)
+			last_comnd = last_comnd->next;
+		return last_comnd;
 	}
 
 	/*Accepts data of command and create quad command that add to
@@ -154,24 +154,24 @@
 		// 	printf("Second argument: %s\n", secondArg ? secondArg : "NULL");
 		// 	printf("Third argument: %s\n", thirdArg ? thirdArg : "NULL");
 		// }}
-		command *newCommand, *prevCommand;
+		command *new_comnd, *previous_comnd;
 
 		if( !head )
 		{
 			head = (command *)malloc(sizeof(command));
-			newCommand = head;
+			new_comnd = head;
 		}
 		else
 		{
-			prevCommand = get_last_command( head );
-			newCommand = (command *)malloc(sizeof(command));
-			prevCommand->next = newCommand;
+			previous_comnd = get_last_command( head );
+			new_comnd = (command *)malloc(sizeof(command));
+			previous_comnd->next = new_comnd;
 		}
-		sprintf(newCommand->com, "%c%s", type, com);
-		sprintf(newCommand->firstArg, "%s", firstArg);
-		sprintf(newCommand->secondArg, "%s", secondArg);
-		sprintf(newCommand->thirdArg, "%s", thirdArg);
-		newCommand->next = NULL;
+		sprintf(new_comnd->com, "%c%s", type, com);
+		sprintf(new_comnd->firstArg, "%s", firstArg);
+		sprintf(new_comnd->secondArg, "%s", secondArg);
+		sprintf(new_comnd->thirdArg, "%s", thirdArg);
+		new_comnd->next = NULL;
 		return head;
 	}
 
@@ -194,7 +194,7 @@
 				return translate_comand(expHead, genChars[0].charCmd, genStrings[1].stringCmd, var, exp, " ");
 			if (!expHead)
 				return translate_comand(NULL, symbol->type, genStrings[2].stringCmd, var, exp, " ");
-			renameArg(get_last_command(expHead), var);
+			rename_argument(get_last_command(expHead), var);
 			return expHead;
 		}
 		return NULL;
@@ -207,9 +207,9 @@
 		command* head = NULL;
 		var_node* symbol;
 		if (firstType == genChars[0].charCmd && secondType == genChars[1].charCmd) 
-			firstHead = floatConvert(firstHead, firstArgLast);
+			firstHead = convert_to_float(firstHead, firstArgLast);
 		else if (secondType == genChars[0].charCmd && firstType == genChars[1].charCmd)
-			secondHead = floatConvert(secondHead, secondArgLast);
+			secondHead = convert_to_float(secondHead, secondArgLast);
 		free_state(firstArgLast);
 		free_state(secondArgLast);
 		head = merege_comand(firstHead, secondHead);
@@ -306,7 +306,7 @@
 
 	/*Accept pointer to command head take last element and convert this
 		command to float command and return and converted command*/
-	command* floatConvert(command* head, char* last)
+	command* convert_to_float(command* head, char* last)
 	{
 	 		var_node* commandName;
 
@@ -319,7 +319,7 @@
 
 	/*Accept pointer to command head take last element and convert this
 		command to integer command and return and converted command*/
-	command* intConvert(command* head, char* last)
+	command* convert_to_int(command* head, char* last)
 	{
 		var_node* commandName;
 
@@ -331,7 +331,7 @@
 	}
 
 	/*	Accepts two types and decides which type need to return*/
-	char typeUpdate(char type1, char type2)
+	char type_decider (char type1, char type2)
 	{
 		if (type1 == genChars[1].charCmd || type2 == genChars[1].charCmd)
 			return genChars[1].charCmd;
@@ -357,14 +357,14 @@
 
 	/*Accept pointer to list of commands and pointer of label command and
 	rename first argument of all commands list according to label*/
-	void updateList(command_list* head, command* label)
+	void update_list_to_label(command_list* head, command* label)
 	{
 		command_list* next;
 
 		while (head)
 		{
 			next = head->next;
-			renameArg(head->com, label->com);
+			rename_argument(head->com, label->com);
 			free(head);
 			head = next;
 		}
@@ -372,7 +372,7 @@
 
 	/*Accept pointer to command and
 	rename his first argument*/
-	void renameArg(command* com, char* newArg)
+	void rename_argument(command* com, char* newArg)
 	{
 		free_state(com->firstArg);
 		sprintf(com->firstArg, "%s", newArg);
@@ -402,7 +402,7 @@
 			{
 				if (*(head->firstArg) == genChars[4].charCmd)
 					sprintf(head->firstArg, "%d", lables[atoi(1 + head->firstArg)]);
-				fprintf(quadFile, "%s\t%s\t%s\t%s\n", head->com, head->firstArg, head->secondArg, head->thirdArg);
+				fprintf(quad, "%s\t%s\t%s\t%s\n", head->com, head->firstArg, head->secondArg, head->thirdArg);
 			}
 			head = head->next;
 		}

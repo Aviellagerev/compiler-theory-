@@ -35,7 +35,7 @@ extern int yyparse();
 /*Variable that check if file .ou have errors*/
 extern int error_number;
 
-FILE* quadFile;/*QUAD file*/
+FILE* quad;/*QUAD file*/
 
 /*Error messages*/
  errMsg messages[] = {

@@ -77,7 +77,8 @@
 extern int yylex (void);
 int yyerror(const char *s);
 extern int line;
-command_list *case_jumps = NULL; /* For tracking all case jumps */
+//lies didnt find a workaround for now 
+command_list *case_jumps = NULL; /* For tracking all case jumps CAN BE DELETED found work around*/
 int number = 0; /* Counter for numeric values */
 int error_number = 0; /* Counter for errors */
 var_node *current_varible = NULL, *next_varible = NULL; /* Variables for symbol table */
@@ -87,7 +88,7 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
 
-#line 91 "parser.tab.c"
+#line 92 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -557,11 +558,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    93,    93,   103,   104,   107,   107,   110,   111,   114,
-     115,   118,   119,   120,   121,   122,   123,   124,   125,   128,
-     135,   146,   154,   170,   183,   215,   238,   243,   246,   249,
-     250,   253,   265,   273,   279,   287,   295,   307,   313,   322,
-     328,   337,   344,   360,   372
+       0,    94,    94,   104,   105,   108,   108,   111,   112,   115,
+     116,   119,   120,   121,   122,   123,   124,   125,   126,   129,
+     136,   147,   155,   171,   184,   215,   243,   248,   251,   254,
+     255,   258,   270,   278,   284,   292,   300,   312,   318,   327,
+     333,   342,   349,   365,   377
 };
 #endif
 
@@ -1454,7 +1455,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: declarations stmt_block  */
-#line 94 "parser.y"
+#line 95 "parser.y"
 {
     /* Translate the entire program into commands and print them */
     (yyvsp[0].stmt) = translate_comand((yyvsp[0].stmt), 'H', "ALT", "", "", "");
@@ -1462,98 +1463,98 @@ yyreduce:
     free_tree(); /* Free the syntax tree */
     free_list((yyvsp[0].stmt)); /* Free the command list */
 }
-#line 1466 "parser.tab.c"
+#line 1467 "parser.tab.c"
     break;
 
   case 5: /* $@1: %empty  */
-#line 107 "parser.y"
+#line 108 "parser.y"
                              { set_varible_type((yyvsp[0].type)); }
-#line 1472 "parser.tab.c"
+#line 1473 "parser.tab.c"
     break;
 
   case 7: /* type: INT  */
-#line 110 "parser.y"
+#line 111 "parser.y"
           { (yyval.type) = (yyvsp[0].type); }
-#line 1478 "parser.tab.c"
+#line 1479 "parser.tab.c"
     break;
 
   case 8: /* type: FLOAT  */
-#line 111 "parser.y"
+#line 112 "parser.y"
         { (yyval.type) = (yyvsp[0].type); }
-#line 1484 "parser.tab.c"
+#line 1485 "parser.tab.c"
     break;
 
   case 9: /* idlist: idlist ',' ID  */
-#line 114 "parser.y"
+#line 115 "parser.y"
                       { set_varible_name((yyvsp[0].id)); }
-#line 1490 "parser.tab.c"
+#line 1491 "parser.tab.c"
     break;
 
   case 10: /* idlist: ID  */
-#line 115 "parser.y"
+#line 116 "parser.y"
      { set_varible_name((yyvsp[0].id)); }
-#line 1496 "parser.tab.c"
+#line 1497 "parser.tab.c"
     break;
 
   case 11: /* stmt: assignment_stmt  */
-#line 118 "parser.y"
+#line 119 "parser.y"
                       { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1502 "parser.tab.c"
+#line 1503 "parser.tab.c"
     break;
 
   case 12: /* stmt: input_stmt  */
-#line 119 "parser.y"
+#line 120 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1508 "parser.tab.c"
+#line 1509 "parser.tab.c"
     break;
 
   case 13: /* stmt: output_stmt  */
-#line 120 "parser.y"
+#line 121 "parser.y"
               { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1514 "parser.tab.c"
+#line 1515 "parser.tab.c"
     break;
 
   case 14: /* stmt: if_stmt  */
-#line 121 "parser.y"
+#line 122 "parser.y"
           { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1520 "parser.tab.c"
+#line 1521 "parser.tab.c"
     break;
 
   case 15: /* stmt: while_stmt  */
-#line 122 "parser.y"
+#line 123 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1526 "parser.tab.c"
+#line 1527 "parser.tab.c"
     break;
 
   case 16: /* stmt: switch_stmt  */
-#line 123 "parser.y"
+#line 124 "parser.y"
               { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1532 "parser.tab.c"
+#line 1533 "parser.tab.c"
     break;
 
   case 17: /* stmt: break_stmt  */
-#line 124 "parser.y"
+#line 125 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1538 "parser.tab.c"
+#line 1539 "parser.tab.c"
     break;
 
   case 18: /* stmt: stmt_block  */
-#line 125 "parser.y"
+#line 126 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1544 "parser.tab.c"
+#line 1545 "parser.tab.c"
     break;
 
   case 19: /* assignment_stmt: ID '=' expression ';'  */
-#line 129 "parser.y"
+#line 130 "parser.y"
 {
     /* Add an assignment command to the command list */
     (yyval.stmt) = add_assign_commadn((yyvsp[-3].id), (yyvsp[-1].expression).last, (yyvsp[-1].expression).type, (yyvsp[-1].expression).head);
 }
-#line 1553 "parser.tab.c"
+#line 1554 "parser.tab.c"
     break;
 
   case 20: /* input_stmt: INPUT '(' ID ')' ';'  */
-#line 136 "parser.y"
+#line 137 "parser.y"
 {
     /* Generate an input command for the specified variable */
     (yyval.stmt) = NULL;
@@ -1562,21 +1563,21 @@ yyreduce:
     else
         (yyval.stmt) = translate_comand(NULL, current_varible->type, "INP", current_varible->name, "", "");
 }
-#line 1566 "parser.tab.c"
+#line 1567 "parser.tab.c"
     break;
 
   case 21: /* output_stmt: OUTPUT '(' expression ')' ';'  */
-#line 147 "parser.y"
+#line 148 "parser.y"
 {
     /* Generate an output command for the expression */
     (yyval.stmt) = translate_comand((yyvsp[-2].expression).head, (yyvsp[-2].expression).type, "PRT", (yyvsp[-2].expression).last, "", "");
     free_state((yyvsp[-2].expression).last); /* Free the state after output */
 }
-#line 1576 "parser.tab.c"
+#line 1577 "parser.tab.c"
     break;
 
   case 22: /* if_stmt: IF '(' boolexpr ')' stmt ELSE stmt  */
-#line 155 "parser.y"
+#line 156 "parser.y"
 {
     /* Merge the boolean expression and statements for the if-else construct */
     /*if->bool->smnt if false */
@@ -1585,16 +1586,16 @@ yyreduce:
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command((yyval.stmt)));
     (yyval.stmt) = add_label((yyval.stmt));
-    updateList((yyvsp[-4].boolean).false, get_last_command((yyval.stmt)));/*here is the continue for false update the jump */
+    update_list_to_label((yyvsp[-4].boolean).false, get_last_command((yyval.stmt)));/*here is the continue for false update the jump */
     (yyval.stmt) = merege_comand((yyval.stmt), (yyvsp[0].stmt));
     (yyval.stmt) = add_label((yyval.stmt));
-    updateList(temp_link, get_last_command((yyval.stmt)));
+    update_list_to_label(temp_link, get_last_command((yyval.stmt)));
 }
-#line 1594 "parser.tab.c"
+#line 1595 "parser.tab.c"
     break;
 
   case 23: /* while_stmt: WHILE '(' boolexpr ')' stmt  */
-#line 171 "parser.y"
+#line 172 "parser.y"
 {
     /* Generate commands for the while loop */
     (yyval.stmt) = add_label(NULL);
@@ -1602,25 +1603,24 @@ yyreduce:
     (yyval.stmt) = merege_comand((yyval.stmt), (yyvsp[0].stmt));
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command((yyval.stmt)));
-    updateList(temp_link, (yyval.stmt));
+    update_list_to_label(temp_link, (yyval.stmt));
     (yyval.stmt) = add_label((yyval.stmt));
-    updateList((yyvsp[-2].boolean).false, get_last_command((yyval.stmt)));
+    update_list_to_label((yyvsp[-2].boolean).false, get_last_command((yyval.stmt)));
 }
-#line 1610 "parser.tab.c"
+#line 1611 "parser.tab.c"
     break;
 
   case 24: /* switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'  */
-#line 184 "parser.y"
+#line 185 "parser.y"
 {
    // Generate temporary for switch expression
-  // Generate temporary for switch expression
     next_varible = add_temp_var(current_varible->type);
     
     // Start with case comparisons
     (yyvsp[-7].expression).head = merege_comand((yyvsp[-7].expression).head, (yyvsp[-4].stmt));
     
     // Add jump to default case
-    (yyvsp[-7].expression).head = translate_comand((yyvsp[-7].expression).head, 'J', "UMP", "", "", "");
+   // $3.head = translate_comand($3.head, 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command((yyvsp[-7].expression).head));
     
     // Add default label
@@ -1633,8 +1633,8 @@ yyreduce:
     (yyvsp[-7].expression).head = add_label((yyvsp[-7].expression).head);
     
     // Update all jumps (both case jumps and the initial default jump)
-    updateList(temp_link, get_last_command((yyvsp[-7].expression).head));
-    updateList(case_jumps, get_last_command((yyvsp[-7].expression).head));
+    update_list_to_label(temp_link, get_last_command((yyvsp[-7].expression).head));
+   update_list_to_label(case_jumps, get_last_command((yyvsp[-7].expression).head));
     
     // Clean up
     case_jumps = NULL;
@@ -1658,185 +1658,190 @@ yyreduce:
     // Add case body
     (yyval.stmt) = merege_comand((yyval.stmt), (yyvsp[0].stmt));
     
+    //this is where switch case issue accores it gives the last line HALT 
     // Add unconditional jump to end of switch
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "UMP", "", "", "");
+   //the case jump is to keep count of the amount of cases can be done more efficently
+   //need to implement this better can be done with counter or somthing to count line 
+   //of each case 
+   //for now this works
     case_jumps = add_new_command_list(case_jumps, get_last_command((yyval.stmt)));
     
     // Add label for next case
     (yyval.stmt) = add_label((yyval.stmt));
-    updateList(temp_link, get_last_command((yyval.stmt)));
+    update_list_to_label(temp_link, get_last_command((yyval.stmt)));
 }
-#line 1670 "parser.tab.c"
+#line 1675 "parser.tab.c"
     break;
 
   case 26: /* caselist: %empty  */
-#line 238 "parser.y"
+#line 243 "parser.y"
 { 
     (yyval.stmt) = NULL; 
-    case_jumps = NULL; 
+   case_jumps = NULL; 
 }
-#line 1679 "parser.tab.c"
+#line 1684 "parser.tab.c"
     break;
 
   case 27: /* break_stmt: BREAK ';'  */
-#line 243 "parser.y"
+#line 248 "parser.y"
                       { (yyval.stmt) = NULL; }
-#line 1685 "parser.tab.c"
+#line 1690 "parser.tab.c"
     break;
 
   case 28: /* stmt_block: '{' stmtlist '}'  */
-#line 246 "parser.y"
+#line 251 "parser.y"
                              { (yyval.stmt) = (yyvsp[-1].stmt); }
-#line 1691 "parser.tab.c"
+#line 1696 "parser.tab.c"
     break;
 
   case 29: /* stmtlist: stmtlist stmt  */
-#line 249 "parser.y"
+#line 254 "parser.y"
                         { (yyval.stmt) = merege_comand((yyvsp[-1].stmt), (yyvsp[0].stmt)); }
-#line 1697 "parser.tab.c"
+#line 1702 "parser.tab.c"
     break;
 
   case 30: /* stmtlist: %empty  */
-#line 250 "parser.y"
+#line 255 "parser.y"
             { (yyval.stmt) = NULL; }
-#line 1703 "parser.tab.c"
+#line 1708 "parser.tab.c"
     break;
 
   case 31: /* boolexpr: boolexpr OR boolterm  */
-#line 254 "parser.y"
+#line 259 "parser.y"
 {
     /* Generate commands for logical OR */
     (yyval.boolean).head = translate_comand((yyvsp[-2].boolean).head, 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
     (yyval.boolean).head = add_label((yyval.boolean).head);
-    updateList((yyvsp[-2].boolean).false, get_last_command((yyval.boolean).head));
+    update_list_to_label((yyvsp[-2].boolean).false, get_last_command((yyval.boolean).head));
     (yyval.boolean).head = merege_comand((yyval.boolean).head, (yyvsp[0].boolean).head);
     add_label((yyval.boolean).head);
-    updateList(temp_link, get_last_command((yyval.boolean).head));
+    update_list_to_label(temp_link, get_last_command((yyval.boolean).head));
     (yyval.boolean).false = (yyvsp[0].boolean).false;
 }
-#line 1719 "parser.tab.c"
+#line 1724 "parser.tab.c"
     break;
 
   case 32: /* boolexpr: boolterm  */
-#line 266 "parser.y"
+#line 271 "parser.y"
 {
     /* Boolean term */
     (yyval.boolean).head = (yyvsp[0].boolean).head;
     (yyval.boolean).false = (yyvsp[0].boolean).false;
 }
-#line 1729 "parser.tab.c"
+#line 1734 "parser.tab.c"
     break;
 
   case 33: /* boolterm: boolterm AND boolfactor  */
-#line 274 "parser.y"
+#line 279 "parser.y"
 {
     /* Generate commands for logical AND */
     (yyval.boolean).head = merege_comand((yyvsp[-2].boolean).head, (yyvsp[0].boolean).head);
-    (yyval.boolean).false = mergeLists((yyvsp[-2].boolean).false, (yyvsp[0].boolean).false);
+    (yyval.boolean).false = merge_comnd_list((yyvsp[-2].boolean).false, (yyvsp[0].boolean).false);
 }
-#line 1739 "parser.tab.c"
+#line 1744 "parser.tab.c"
     break;
 
   case 34: /* boolterm: boolfactor  */
-#line 280 "parser.y"
+#line 285 "parser.y"
 {
     /* Boolean factor */
     (yyval.boolean).false = (yyvsp[0].boolean).false;
     (yyval.boolean).head = (yyvsp[0].boolean).head;
 }
-#line 1749 "parser.tab.c"
+#line 1754 "parser.tab.c"
     break;
 
   case 35: /* boolfactor: NOT '(' boolexpr ')'  */
-#line 288 "parser.y"
+#line 293 "parser.y"
 {
     /* Generate commands for logical NOT */
     (yyval.boolean).head = translate_comand((yyvsp[-1].boolean).head, 'J', "UMP", "", "", "");
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
     add_label((yyval.boolean).head);
-    updateList((yyvsp[-1].boolean).false, get_last_command((yyval.boolean).head));
+    update_list_to_label((yyvsp[-1].boolean).false, get_last_command((yyval.boolean).head));
 }
-#line 1761 "parser.tab.c"
+#line 1766 "parser.tab.c"
     break;
 
   case 36: /* boolfactor: expression RELOP expression  */
-#line 296 "parser.y"
+#line 301 "parser.y"
 {
     /* Generate commands for relational operators */
     if ((yyvsp[-2].expression).type == 'I' && (yyvsp[0].expression).type == 'R')
-        (yyvsp[-2].expression).head = floatConvert((yyvsp[-2].expression).head, (yyvsp[-2].expression).last);
+        (yyvsp[-2].expression).head = convert_to_float((yyvsp[-2].expression).head, (yyvsp[-2].expression).last);
     else if ((yyvsp[0].expression).type == 'I' && (yyvsp[-2].expression).type == 'R')
-        (yyvsp[0].expression).head = floatConvert((yyvsp[0].expression).head, (yyvsp[0].expression).last);
-    (yyval.boolean).head = build_relop_command((yyvsp[-1].relop), (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).head, (yyvsp[0].expression).head, typeUpdate((yyvsp[-2].expression).type, (yyvsp[0].expression).type));
+        (yyvsp[0].expression).head = convert_to_float((yyvsp[0].expression).head, (yyvsp[0].expression).last);
+    (yyval.boolean).head = build_relop_command((yyvsp[-1].relop), (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).head, (yyvsp[0].expression).head, type_decider ((yyvsp[-2].expression).type, (yyvsp[0].expression).type));
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));/*update the line number for the jump*/
 }
-#line 1775 "parser.tab.c"
+#line 1780 "parser.tab.c"
     break;
 
   case 37: /* expression: expression ADDOP term  */
-#line 308 "parser.y"
+#line 313 "parser.y"
 {
     /* Generate commands for addition/subtraction */
-    (yyval.expression).type = typeUpdate((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
+    (yyval.expression).type = type_decider ((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1785 "parser.tab.c"
+#line 1790 "parser.tab.c"
     break;
 
   case 38: /* expression: term  */
-#line 314 "parser.y"
+#line 319 "parser.y"
 {
     /* Term in an expression */
     (yyval.expression).type = (yyvsp[0].expression).type;
     (yyval.expression).head = (yyvsp[0].expression).head;
     strcpy((yyval.expression).last, (yyvsp[0].expression).last);
 }
-#line 1796 "parser.tab.c"
+#line 1801 "parser.tab.c"
     break;
 
   case 39: /* term: term MULOP factor  */
-#line 323 "parser.y"
+#line 328 "parser.y"
 {
     /* Generate commands for multiplication/division */
-    (yyval.expression).type = typeUpdate((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
+    (yyval.expression).type = type_decider ((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1806 "parser.tab.c"
+#line 1811 "parser.tab.c"
     break;
 
   case 40: /* term: factor  */
-#line 329 "parser.y"
+#line 334 "parser.y"
 {
     /* Factor in a term */
     (yyval.expression).type = (yyvsp[0].expression).type;
     (yyval.expression).head = (yyvsp[0].expression).head;
     strcpy((yyval.expression).last, (yyvsp[0].expression).last);
 }
-#line 1817 "parser.tab.c"
+#line 1822 "parser.tab.c"
     break;
 
   case 41: /* factor: '(' expression ')'  */
-#line 338 "parser.y"
+#line 343 "parser.y"
 {
     /* Parenthesized expression */
     (yyval.expression).type = (yyvsp[-1].expression).type;
     (yyval.expression).head = (yyvsp[-1].expression).head;
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1828 "parser.tab.c"
+#line 1833 "parser.tab.c"
     break;
 
   case 42: /* factor: CAST '(' expression ')'  */
-#line 345 "parser.y"
+#line 350 "parser.y"
 {
     /* Cast expression */
     number = cast((yyvsp[-3].cast_op));
     if (number == 1 && (yyvsp[-1].expression).type == 'R') {
-        (yyval.expression).head = intConvert((yyvsp[-1].expression).head, (yyvsp[-1].expression).last);
+        (yyval.expression).head = convert_to_int((yyvsp[-1].expression).head, (yyvsp[-1].expression).last);
         (yyval.expression).type = 'I';
     } else if (number == 2 && (yyvsp[-1].expression).type == 'I') {
-        (yyval.expression).head = floatConvert((yyvsp[-1].expression).head, (yyvsp[-1].expression).last);
+        (yyval.expression).head = convert_to_float((yyvsp[-1].expression).head, (yyvsp[-1].expression).last);
         (yyval.expression).type = 'R';
     } else {
         (yyval.expression).type = (yyvsp[-1].expression).type;
@@ -1844,11 +1849,11 @@ yyreduce:
     }
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1848 "parser.tab.c"
+#line 1853 "parser.tab.c"
     break;
 
   case 43: /* factor: ID  */
-#line 361 "parser.y"
+#line 366 "parser.y"
 {
     /* Identifier */
     (yyval.expression).head = NULL;
@@ -1860,22 +1865,22 @@ yyreduce:
         (yyval.expression).type = current_varible->type;
     }
 }
-#line 1864 "parser.tab.c"
+#line 1869 "parser.tab.c"
     break;
 
   case 44: /* factor: NUM  */
-#line 373 "parser.y"
+#line 378 "parser.y"
 {
     /* Numeric value */
     strcpy((yyval.expression).last, (yyvsp[0].num).value);
     (yyval.expression).type = (yyvsp[0].num).type;
     (yyval.expression).head = NULL;
 }
-#line 1875 "parser.tab.c"
+#line 1880 "parser.tab.c"
     break;
 
 
-#line 1879 "parser.tab.c"
+#line 1884 "parser.tab.c"
 
       default: break;
     }
@@ -2099,7 +2104,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 381 "parser.y"
+#line 386 "parser.y"
 
 
 int yyerror(const char *err)

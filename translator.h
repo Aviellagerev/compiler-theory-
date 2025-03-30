@@ -12,7 +12,7 @@
 #define LABELS 100  /*Number of labels (for jumps) that can use in program*/
 
 /*Pointer to output file.qud*/
-extern FILE *quadFile;
+extern FILE *quad;
 
 /*Type definition of struct command row that have main command and
 three arguments.Data Structure of command row is linked list that
@@ -40,7 +40,7 @@ enum {equal,notEqual,bigger,smaller,biggerOrEqual,smallerOrEqual,castToInt,castT
 
 /*Accepts two pointers to heads of command lists
 and merged them and return merged command list*/
-command_list* mergeLists(command_list*, command_list*);
+command_list* merge_comnd_list(command_list*, command_list*);
 
 /*Accepts pointers to command list and row command heads,
 merged them and return merged command list with this row command*/
@@ -85,11 +85,11 @@ command *add_label(command*);
 
 /*Accept pointer to command head take last element and convert this
 	command to float command and return and converted command*/
-command* floatConvert(command*, char*);
+command* convert_to_float(command*, char*);
 
 /*Accept pointer to command head take last element and convert this
 	command to integer command and return and converted command*/
-command* intConvert(command*, char*);
+command* convert_to_int(command*, char*);
 
 /*	Accepts two types and decides which type need to return*/
 char typeUpdate(char, char);
@@ -100,11 +100,11 @@ int cast(int);
 
 /*Accept pointer to list of commands and pointer of label command and
 rename first argument of all commands list according to label*/
-void updateList(command_list*, command*);
+void update_list_to_label(command_list*, command*);
 
 /*Accept pointer to command and
 rename his first argument*/
-void renameArg(command*, char*);
+void rename_argument(command*, char*);
 
 /*Accept pointer to head of linked list and
 prints all list of commands to file.qud*/

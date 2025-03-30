@@ -17,17 +17,17 @@ int main(int argc, char* argv[])
         
         strcpy(ext,".qud");
         
-        if(!(quadFile = openFile(name, "w")))
+        if(!(quad = openFile(name, "w")))
             return 0;
             
         if(yyparse() || error_number)
         {
-            fclose(quadFile);
+            fclose(quad);
             remove(name);
             fprintf(stderr,"%s", messages[2].string);
         }
         fclose(yyin);
-        fclose(quadFile);
+        fclose(quad);
         
         return 1;
     }
