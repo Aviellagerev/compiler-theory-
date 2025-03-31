@@ -21,7 +21,7 @@ typedef struct var_node {
     int flag;           // 1 = has type, 0 = no type
     struct var_node *next;  // Linked list for handling collisions
 } var_node;
-
+extern FILE* quad;
 void set_varible_name(char* name);
 var_node* search_varible(char* name);
 var_node* add_var_name(char* name);

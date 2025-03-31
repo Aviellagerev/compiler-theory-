@@ -1,4 +1,3 @@
-
 #include "symboltab.h"
 
 var_node* symbol_table[TABLE_SIZE] = {NULL};  // Hash table
