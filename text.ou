@@ -1,20 +1,28 @@
-/*switch expression*/
- 
-cond : int;
+/*convert from decimal to binary */
+
+a , b : int;
+ temp, ten:int;
+
 {
-	input(cond);
-	switch(cond :){
-		case 1:
-			output(1)
-			break;
-		case 2:
-			output(2);
-			break;
-		case 3:
-			output(3);
-			break;			
-	
-			output(0);
-			break;
-	}
-}
+
+    b = 0;
+
+    while (b == 0) {
+       input (a);
+       if(a > 0 && a <= 1000) 
+	       b = 1;
+       else { }
+    }
+
+    ten = 1;
+    b = 0;
+
+    while (a > 0) {
+        temp = a-a/2*2;
+        b = b + temp * ten;
+        ten = ten * 10;
+        a = a / 2;
+    }
+    output(b);
+
+ }

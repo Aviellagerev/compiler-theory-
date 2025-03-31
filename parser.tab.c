@@ -1724,7 +1724,7 @@ yyreduce:
 {
     fprintf(stderr, "ERROR: line %d: switch statement missing 'DEFAULT' case\n", line);
     yyerrok;
-    (yyval.stmt) = NULL;  // You can either recover here or handle the default jump
+    (yyval.stmt) = NULL;  // Yrecove /handle jump
 }
 #line 1730 "parser.tab.c"
     break;
