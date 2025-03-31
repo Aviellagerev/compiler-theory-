@@ -6,7 +6,7 @@ cond : int;
 	switch(cond){
 		case 1:
 			output(1)
-			break;
+			break
 		case 2:
 			output(2);
 			break;

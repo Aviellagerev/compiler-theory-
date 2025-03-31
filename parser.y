@@ -1,3 +1,4 @@
+
 %{
 #include <stdio.h>
 #include <malloc.h>
@@ -5,7 +6,7 @@
 #include "translator.h"
 
 extern int yylex (void);
-int yyerror(const char *s);
+int yyerror( const char *s);
 extern int line;
 //lies didnt find a workaround for now 
 command_list *case_jumps = NULL; /* For tracking all case jumps CAN BE DELETED found work around*/
@@ -17,7 +18,9 @@ command_list *temp_link = NULL; /* Temporary link for command lists */
 char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
+
 %}
+
 %define parse.error verbose
 
 %union
@@ -90,6 +93,8 @@ char case_val[10]; /* Array to store case values */
 %token NOT /* Logical NOT */
 %token <relop> RELOP /* Relational operator */
 
+%token ERROR  // Added for error recovery
+
 %%
 program: declarations stmt_block
 {
@@ -106,6 +111,7 @@ declarations: declarations declaration
 ;
 
 declaration: idlist ':' type { set_varible_type($3); } ';' /* Set the type for variables in the idlist */
+ | error ';' { yyerrok; }  // Declaration error recovery
 ;
 
 type: INT { $$ = $1; } /* Integer type */
@@ -124,6 +130,9 @@ stmt: assignment_stmt { $$ = $1; } /* Assignment statement */
 | switch_stmt { $$ = $1; } /* Switch statement */
 | break_stmt { $$ = $1; } /* Break statement */
 | stmt_block { $$ = $1; } /* Block of statements */
+| error ';' { yyerrok; $$ = NULL; }     // Statement error recovery
+| error '}' { yyerrok; $$ = NULL; }     // Block error recovery
+
 ;
 
 assignment_stmt: ID '=' expression ';'
@@ -137,8 +146,10 @@ input_stmt: INPUT '(' ID ')' ';'
 {
     /* Generate an input command for the specified variable */
     $$ = NULL;
-    if (!(current_varible = search_varible($3)))
+    if (!(current_varible = search_varible($3))){
+         yyerror("Undefined variable in input statement");
         fprintf(stderr, "ERROR: unknown variable, not defined in the symbol table");
+    }
     else
         $$ = translate_comand(NULL, current_varible->type, "INP", current_varible->name, "", "");
 }
@@ -166,6 +177,11 @@ if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
     $$ = add_label($$);
     update_list_to_label(temp_link, get_last_command($$));
 }
+| IF '(' error ')' stmt ELSE stmt  // Error recovery
+    {
+        yyerrok;
+        $$ = NULL;
+    }
 ;
 
 while_stmt: WHILE '(' boolexpr ')' stmt
@@ -180,6 +196,11 @@ while_stmt: WHILE '(' boolexpr ')' stmt
     $$ = add_label($$);
     update_list_to_label($3.false, get_last_command($$));
 }
+| WHILE '(' error ')' stmt  // Error recovery
+    {
+        yyerrok;
+        $$ = NULL;
+    }
 ;
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
@@ -210,6 +231,11 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
     case_jumps = NULL;
     $$ = $3.head;
 }
+| SWITCH '(' error ')' '{' caselist DEFAULT ':' stmtlist '}'  // Error recovery
+    {
+        yyerrok;
+        $$ = NULL;
+    }
 ;
 
 caselist: caselist CASE NUM ':' stmtlist
@@ -381,6 +407,12 @@ factor: '(' expression ')'
     $$.type = $1.type;
     $$.head = NULL;
 }
+| '(' error ')'  // Parenthesis error recovery
+    {
+        yyerrok;
+        $$.type = 0;
+        $$.head = NULL;
+    }
 ;
 
 %%
@@ -388,7 +420,8 @@ factor: '(' expression ')'
 int yyerror(const char *err)
 {
     /* Error handling function */
-    fprintf(stderr, "ERROR: line %d: %s\n", line, err);
-    error_number = 1;
+    fprintf(stderr, "ERROR: line  %d: %s\n", line, err);
+    error_number++;
     return 1;
 }
+

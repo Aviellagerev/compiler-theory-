@@ -73,7 +73,8 @@ extern int yydebug;
     OR = 274,                      /* OR  */
     AND = 275,                     /* AND  */
     NOT = 276,                     /* NOT  */
-    RELOP = 277                    /* RELOP  */
+    RELOP = 277,                   /* RELOP  */
+    ERROR = 278                    /* ERROR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -82,7 +83,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 27 "parser.y"
 
     struct number {
         char value[VARLEN]; /* Value of a number */
@@ -108,7 +109,7 @@ union YYSTYPE
     command *stmt; /* Statement command */
     int relop; /* Relational operator */
 
-#line 112 "parser.tab.h"
+#line 113 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
