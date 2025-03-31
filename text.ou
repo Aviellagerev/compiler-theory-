@@ -3,9 +3,9 @@
 cond : int;
 {
 	input(cond);
-	switch(cond){
+	switch(cond :){
 		case 1:
-			output(1);
+			output(1)
 			break;
 		case 2:
 			output(2);

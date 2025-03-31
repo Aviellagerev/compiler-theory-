@@ -8,8 +8,11 @@
 extern int yylex (void);
 int yyerror( const char *s);
 extern int line;
+
 //lies didnt find a workaround for now 
 command_list *case_jumps = NULL; /* For tracking all case jumps CAN BE DELETED found work around*/
+//double future me still need to figure it out 
+
 int number = 0; /* Counter for numeric values */
 int error_number = 0; /* Counter for errors */
 var_node *current_varible = NULL, *next_varible = NULL; /* Variables for symbol table */
@@ -236,6 +239,12 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
         yyerrok;
         $$ = NULL;
     }
+| SWITCH '(' expression ')' '{' caselist '}'  // Handle missing DEFAULT
+{
+    fprintf(stderr, "ERROR: line %d: switch statement missing 'DEFAULT' case\n", line);
+    yyerrok;
+    $$ = NULL;  // Yrecove /handle jump
+}
 ;
 
 caselist: caselist CASE NUM ':' stmtlist
