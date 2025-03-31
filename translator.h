@@ -92,7 +92,7 @@ command* convert_to_float(command*, char*);
 command* convert_to_int(command*, char*);
 
 /*	Accepts two types and decides which type need to return*/
-char typeUpdate(char, char);
+char type_decider(char, char);
 
 /*Accepts number and by this number function tell as if cast is 
 float or int.Return number which that point what kind of cast.*/
