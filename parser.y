@@ -106,15 +106,31 @@ program: declarations stmt_block
     command_print($2);
     free_tree(); /* Free the syntax tree */
     free_list($2); /* Free the command list */
-}
+} ;
+| error { 
+            yyerror("invalid program"); 
+            yyerrok; 
+            free_tree();
+         //   free_list($1);
+            YYABORT;
+          }
 ;
 
 declarations: declarations declaration
 | /*epsilon*/ /* Empty declaration */
+|declarations error ';' { 
+                yyerror("invalid declaration"); 
+                yyerrok; 
+                yyclearin; 
+              }
 ;
 
 declaration: idlist ':' type { set_varible_type($3); } ';' /* Set the type for variables in the idlist */
- | error ';' { yyerrok; }  // Declaration error recovery
+| error ';' { 
+                yyerror("invalid declaration syntax"); 
+                yyerrok; 
+                yyclearin; 
+              }
 ;
 
 type: INT { $$ = $1; } /* Integer type */
@@ -123,6 +139,11 @@ type: INT { $$ = $1; } /* Integer type */
 
 idlist: idlist ',' ID { set_varible_name($3); } /* Add a variable to the idlist */
 | ID { set_varible_name($1); } /* Single variable in the idlist */
+| idlist error ',' ID { 
+            yyerror("invalid identifier list"); 
+            yyerrok; 
+            yyclearin; 
+          }
 ;
 
 stmt: assignment_stmt { $$ = $1; } /* Assignment statement */
@@ -133,8 +154,12 @@ stmt: assignment_stmt { $$ = $1; } /* Assignment statement */
 | switch_stmt { $$ = $1; } /* Switch statement */
 | break_stmt { $$ = $1; } /* Break statement */
 | stmt_block { $$ = $1; } /* Block of statements */
-| error ';' { yyerrok; $$ = NULL; }     // Statement error recovery
-| error '}' { yyerrok; $$ = NULL; }     // Block error recovery
+ | error ';' { 
+          yyerror("invalid statement"); 
+          yyerrok; 
+          yyclearin; 
+          $$ = NULL; 
+        }
 
 ;
 
@@ -143,6 +168,12 @@ assignment_stmt: ID '=' expression ';'
     /* Add an assignment command to the command list */
     $$ = add_assign_commadn($1, $3.last, $3.type, $3.head);
 }
+| ID '=' error ';' { 
+                     yyerror("invalid assignment"); 
+                     yyerrok; 
+                     yyclearin; 
+                     $$ = NULL; 
+                   }
 ;
 
 input_stmt: INPUT '(' ID ')' ';'
@@ -156,6 +187,12 @@ input_stmt: INPUT '(' ID ')' ';'
     else
         $$ = translate_comand(NULL, current_varible->type, "INP", current_varible->name, "", "");
 }
+| INPUT '(' error ')' ';' { 
+                yyerror("invalid input syntax"); 
+                yyerrok; 
+                yyclearin; 
+                $$ = NULL; 
+              }
 ;
 
 output_stmt: OUTPUT '(' expression ')' ';'
@@ -164,6 +201,12 @@ output_stmt: OUTPUT '(' expression ')' ';'
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
     free_state($3.last); /* Free the state after output */
 }
+| OUTPUT '(' error ')' ';' { 
+                 yyerror("invalid output syntax"); 
+                 yyerrok; 
+                 yyclearin; 
+                 $$ = NULL; 
+               }
 ;
 
 if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
@@ -180,11 +223,17 @@ if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
     $$ = add_label($$);
     update_list_to_label(temp_link, get_last_command($$));
 }
-| IF '(' error ')' stmt ELSE stmt  // Error recovery
-    {
-        yyerrok;
-        $$ = NULL;
-    }
+| IF '(' error ')' stmt ELSE stmt { 
+             yyerror("invalid if condition"); 
+             yyerrok; 
+             yyclearin; 
+             $$ = NULL; 
+           }
+| IF '(' boolexpr ')' error ELSE stmt { 
+             yyerror("invalid if body"); 
+             yyerrok; 
+             yyclearin; 
+           }
 ;
 
 while_stmt: WHILE '(' boolexpr ')' stmt
@@ -199,11 +248,12 @@ while_stmt: WHILE '(' boolexpr ')' stmt
     $$ = add_label($$);
     update_list_to_label($3.false, get_last_command($$));
 }
-| WHILE '(' error ')' stmt  // Error recovery
-    {
-        yyerrok;
-        $$ = NULL;
-    }
+ | WHILE '(' error ')' stmt { 
+                yyerror("invalid while condition"); 
+                yyerrok; 
+                yyclearin; 
+                $$ = NULL; 
+              }
 ;
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
@@ -234,11 +284,12 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
     case_jumps = NULL;
     $$ = $3.head;
 }
-| SWITCH '(' error ')' '{' caselist DEFAULT ':' stmtlist '}'  // Error recovery
-    {
-        yyerrok;
-        $$ = NULL;
-    }
+  | SWITCH '(' error ')' '{' caselist DEFAULT ':' stmtlist '}' { 
+                 yyerror("invalid switch expression"); 
+                 yyerrok; 
+                 yyclearin; 
+                 $$ = NULL; 
+               }
 | SWITCH '(' expression ')' '{' caselist '}'  // Handle missing DEFAULT
 {
     fprintf(stderr, "ERROR: line %d: switch statement missing 'DEFAULT' case\n", line);
@@ -274,19 +325,41 @@ caselist: caselist CASE NUM ':' stmtlist
     $$ = add_label($$);
     update_list_to_label(temp_link, get_last_command($$));
 }
-| /* empty */ 
+| caselist CASE error ':' stmtlist { 
+              yyerror("invalid case statement"); 
+              yyerrok; 
+              yyclearin; 
+            }
+| /* empty */  //might need to change this here 
 { 
     $$ = NULL; 
    case_jumps = NULL; 
 }
 
 break_stmt: BREAK ';' { $$ = NULL; } /* Break statement */
+| BREAK error { 
+                yyerror("invalid break statement"); 
+                yyerrok; 
+                yyclearin; 
+                $$ = NULL; 
+              }
 ;
 
 stmt_block: '{' stmtlist '}' { $$ = $2; } /* Block of statements */
+| '{' error '}' { 
+                yyerror("invalid statement block"); 
+                yyerrok; 
+                yyclearin; 
+                $$ = NULL; 
+              }
 ;
 
-stmtlist: stmtlist stmt { $$ = merege_comand($1, $2); } /* List of statements */
+stmtlist: stmtlist stmt { $$ = merege_comand($1, $2); }
+| stmtlist error ';' { 
+              yyerror("invalid statement in list"); 
+              yyerrok; 
+              yyclearin; 
+            } /* List of statements */
 | /*empty*/ { $$ = NULL; } /* Empty statement list */
 ;
 
@@ -302,12 +375,20 @@ boolexpr: boolexpr OR boolterm
     update_list_to_label(temp_link, get_last_command($$.head));
     $$.false = $3.false;
 }
+
 | boolterm
 {
     /* Boolean term */
     $$.head = $1.head;
     $$.false = $1.false;
 }
+| error { 
+              yyerror("invalid boolean expression"); 
+              yyerrok; 
+              yyclearin; 
+              $$.head = NULL; 
+              $$.false = NULL; 
+            }
 ;
 
 boolterm: boolterm AND boolfactor
@@ -322,6 +403,13 @@ boolterm: boolterm AND boolfactor
     $$.false = $1.false;
     $$.head = $1.head;
 }
+ | error { 
+              yyerror("invalid boolean term"); 
+              yyerrok; 
+              yyclearin; 
+              $$.head = NULL; 
+              $$.false = NULL; 
+            }
 ;
 
 boolfactor: NOT '(' boolexpr ')'
@@ -332,6 +420,13 @@ boolfactor: NOT '(' boolexpr ')'
     add_label($$.head);
     update_list_to_label($3.false, get_last_command($$.head));
 }
+| NOT '(' error ')' { 
+                yyerror("invalid boolean factor"); 
+                yyerrok; 
+                yyclearin; 
+                $$.head = NULL; 
+                $$.false = NULL; 
+              }
 | expression RELOP expression
 {
     /* Generate commands for relational operators */
@@ -342,6 +437,13 @@ boolfactor: NOT '(' boolexpr ')'
     $$.head = build_relop_command($2, $1.last, $3.last, $1.head, $3.head, type_decider ($1.type, $3.type));
     $$.false = add_new_command_list(NULL, get_last_command($$.head));/*update the line number for the jump*/
 }
+| error RELOP expression { 
+                yyerror("invalid boolean factor"); 
+                yyerrok; 
+                yyclearin; 
+                $$.head = NULL; 
+                $$.false = NULL; 
+              }
 ;
 
 expression: expression ADDOP term
@@ -357,6 +459,13 @@ expression: expression ADDOP term
     $$.head = $1.head;
     strcpy($$.last, $1.last);
 }
+| error { 
+                yyerror("invalid expression"); 
+                yyerrok; 
+                yyclearin; 
+                $$.head = NULL; 
+                strcpy($$.last, ""); 
+              }
 ;
 
 term: term MULOP factor
@@ -372,6 +481,13 @@ term: term MULOP factor
     $$.head = $1.head;
     strcpy($$.last, $1.last);
 }
+    | error { 
+          yyerror("invalid term"); 
+          yyerrok; 
+          yyclearin; 
+          $$.head = NULL; 
+          strcpy($$.last, ""); 
+        }
 ;
 
 factor: '(' expression ')'
@@ -416,6 +532,13 @@ factor: '(' expression ')'
     $$.type = $1.type;
     $$.head = NULL;
 }
+| CAST '(' error ')' { 
+            yyerror("invalid cast expression"); 
+            yyerrok; 
+            yyclearin; 
+            $$.head = NULL; 
+            strcpy($$.last, ""); 
+          }
 | '(' error ')'  // Parenthesis error recovery
     {
         yyerrok;
