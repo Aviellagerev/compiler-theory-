@@ -365,7 +365,7 @@
 		{
 			next = head->next;
 			rename_argument(head->com, label->com);
-			free(head);
+			//free(head);
 			head = next;
 		}
 	}

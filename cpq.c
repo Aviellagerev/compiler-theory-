@@ -26,8 +26,10 @@ int main(int argc, char* argv[])
             remove(name);
             fprintf(stderr,"%s", messages[2].string);
         }
+        else{
         fclose(yyin);
         fclose(quad);
+        }
         
         return 1;
     }
