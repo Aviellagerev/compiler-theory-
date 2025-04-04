@@ -1622,7 +1622,7 @@ yyreduce:
 
   case 24: /* assignment_stmt: ID '=' expression  */
 #line 109 "parser.y"
-                    { fprintf(stderr, "ERROR: line %d: missing semicolon after assignment\n", line); (yyval.stmt) = NULL; }
+                    { fprintf(stderr, "ERROR: line %d: missing semicolon after assignment\n", line-1); (yyval.stmt) = NULL; }
 #line 1627 "parser.tab.c"
     break;
 
@@ -1640,7 +1640,7 @@ yyreduce:
 
   case 26: /* input_stmt: INPUT '(' ID ')'  */
 #line 120 "parser.y"
-                   { fprintf(stderr, "ERROR: line %d: missing semicolon after input statement\n", line); (yyval.stmt) = NULL; }
+                   { fprintf(stderr, "ERROR: line %d: missing semicolon after input statement\n", line-1); (yyval.stmt) = NULL; }
 #line 1645 "parser.tab.c"
     break;
 
@@ -1655,7 +1655,7 @@ yyreduce:
 
   case 28: /* output_stmt: OUTPUT '(' expression ')'  */
 #line 128 "parser.y"
-                            { fprintf(stderr, "ERROR: line %d: missing semicolon after output statement\n", line); (yyval.stmt) = NULL; }
+                            { fprintf(stderr, "ERROR: line %d: missing semicolon after output statement\n", line-1); (yyval.stmt) = NULL; }
 #line 1660 "parser.tab.c"
     break;
 
@@ -1739,7 +1739,7 @@ yyreduce:
   case 37: /* switch_stmt: SWITCH '(' expression ')' '{' caselist '}'  */
 #line 176 "parser.y"
 {
-    fprintf(stderr, "ERROR: line %d: missing DEFAULT in switch statement\n", line);
+    fprintf(stderr, "ERROR: line %d: missing DEFAULT in switch statement\n", line-1);
     (yyval.stmt) = NULL;
 }
 #line 1746 "parser.tab.c"
@@ -1800,7 +1800,7 @@ yyreduce:
 
   case 44: /* break_stmt: BREAK  */
 #line 209 "parser.y"
-        { fprintf(stderr, "ERROR: line %d: missing semicolon after break\n", line); (yyval.stmt) = NULL; }
+        { fprintf(stderr, "ERROR: line %d: missing semicolon after break\n", line-1); (yyval.stmt) = NULL; }
 #line 1805 "parser.tab.c"
     break;
 

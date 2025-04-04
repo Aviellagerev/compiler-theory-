@@ -106,7 +106,7 @@ assignment_stmt: ID '=' expression ';'
 {
     $$ = add_assign_commadn($1, $3.last, $3.type, $3.head);
 }
-| ID '=' expression { fprintf(stderr, "ERROR: line %d: missing semicolon after assignment\n", line); $$ = NULL; }
+| ID '=' expression { fprintf(stderr, "ERROR: line %d: missing semicolon after assignment\n", line-1); $$ = NULL; }
 ;
 
 input_stmt: INPUT '(' ID ')' ';'
@@ -117,7 +117,7 @@ input_stmt: INPUT '(' ID ')' ';'
     else
         $$ = translate_comand(NULL, current_varible->type, "INP", current_varible->name, "", "");
 }
-| INPUT '(' ID ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after input statement\n", line); $$ = NULL; }
+| INPUT '(' ID ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after input statement\n", line-1); $$ = NULL; }
 ;
 
 output_stmt: OUTPUT '(' expression ')' ';'
@@ -125,7 +125,7 @@ output_stmt: OUTPUT '(' expression ')' ';'
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
     free_state($3.last);
 }
-| OUTPUT '(' expression ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after output statement\n", line); $$ = NULL; }
+| OUTPUT '(' expression ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after output statement\n", line-1); $$ = NULL; }
 ;
 
 if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
@@ -174,7 +174,7 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 }
 | SWITCH '(' expression ')' '{' caselist '}'
 {
-    fprintf(stderr, "ERROR: line %d: missing DEFAULT in switch statement\n", line);
+    fprintf(stderr, "ERROR: line %d: missing DEFAULT in switch statement\n", line-1);
     $$ = NULL;
 }
 | SWITCH '(' error ')' '{' caselist DEFAULT ':' stmtlist '}' { 
@@ -206,7 +206,7 @@ caselist: caselist CASE NUM ':' stmtlist
 ;
 
 break_stmt: BREAK ';' { $$ = NULL; }
-| BREAK { fprintf(stderr, "ERROR: line %d: missing semicolon after break\n", line); $$ = NULL; }
+| BREAK { fprintf(stderr, "ERROR: line %d: missing semicolon after break\n", line-1); $$ = NULL; }
 ;
 
 stmt_block: '{' stmtlist '}' { $$ = $2; }

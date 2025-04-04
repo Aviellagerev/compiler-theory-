@@ -12,8 +12,9 @@ cond : int;
 		case 3:
 			output(3);
 			break;			
-		
+		default:
 			output(0);
 			break;
 	}
+	a
 }
