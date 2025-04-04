@@ -429,7 +429,7 @@ factor: '(' expression ')'
 int yyerror(const char *err)
 {
     /* Error handling function */
-    fprintf(stderr, "ERROR: line  %d: %s\n", line, err);
+    fprintf(stderr, "ERROR: line  %d: %s\n", line-1, err);
     error_number++;
     return 1;
 }

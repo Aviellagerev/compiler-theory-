@@ -40,8 +40,10 @@ int main(int argc, char* argv[]) {
             remove(name);
             cpqReportError(cpqMessages[2]);
         }
+        else{
         fclose(yyin);
         fclose(quad);
+        }
         return 1;
     }
     cpqReportError(cpqMessages[3]);
