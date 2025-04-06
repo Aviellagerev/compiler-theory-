@@ -1,423 +1,323 @@
-	#include "translator.h"
+#include "translator.h"
 
-	#define ERRLEN 100 /*Save place in memory for string*/
-	#define CHAR 1 /*Save place in memory for char*/
-	#define STR 4 /*Save place in memory for char*/
+#define ERRLEN 100 /* Save place in memory for string */
+#define CHAR 1     /* Save place in memory for char */
+#define STR 4      /* Save place in memory for char */
 
-	/*Type definition of string with error message 100 characters in string*/
-	typedef char genErrors[ERRLEN];
+typedef char chars[CHAR];
+typedef char strings[STR];
 
-	/*Type definition of string with error message 100 characters in string*/
-	typedef char chars[CHAR];
+chars CHAR0, CHAR1, CHAR2, CHAR3, CHAR4, CHAR5;
+strings STR0, STR1, STR2, STR3, STR4, STR5, STR6, STR7, STR8, STR9, STR10, STR11, STR12, STR13;
 
-	/*Type definition of string with error message 100 characters in string*/
-	typedef char strings[STR];
+typedef struct {
+    char charCmd;
+    chars* charAddress;
+} charCmd;
 
+typedef struct {
+    char* stringCmd;
+    strings* strAddress;
+} strCmd;
 
+charCmd genChars[] = {
+    {'I', &CHAR0}, /* int */
+    {'R', &CHAR1}, /* float(real) */
+    {'N', &CHAR2}, /* not */
+    {'E', &CHAR3}, /* equal */
+    {'*', &CHAR4}, /* temp number to add label */
+    {'J', &CHAR5}  /* jump */
+};
 
-	/*Definition of two errors messages*/
-	genErrors GENERR0, GENERR1;
+strCmd genStrings[] = {
+    {"1", &STR1},    /* string 1 */
+    {"TOR", &STR2},  /* string 2 */
+    {"ASN", &STR3},  /* string 3 */
+    {"TOI", &STR4},  /* string 4 */
+    {"ADD", &STR5},  /* string 5 */
+    {"SUB", &STR6},  /* string 6 */
+    {"DIV", &STR7},  /* string 7 */
+    {"MLT", &STR8},  /* string 8 */
+    {"EQL", &STR9},  /* string 9 */
+    {"NQL", &STR10}, /* string 10 */
+    {"GRT", &STR11}, /* string 11 */
+    {"LSS", &STR12}, /* string 12 */
+    {"MPZ", &STR13}  /* string 13 */
+};
 
-	/*Definition of five chars*/
-	chars CHAR0, CHAR1, CHAR2, CHAR3, CHAR4, CHAR5 ;
+int labelsCount = 0;
 
-	/*Definition of two chars*/
-	strings STR0, STR1, STR2, STR3, STR4, STR5, STR6, STR7, STR8, STR9, STR10, STR11, STR12, STR13;
+command_list* merge_comnd_list(command_list* head, command_list* tail)
+{
+    command_list* last = head;
+    if (!head)
+        return tail;
+    while (last->next)
+        last = last->next;
+    last->next = tail;
+    return head;
+}
 
-	/*Type definition of struct error message that have string with pointer to error message
-	and pointer to his address in memory that save place array of 100 index's*/
-	typedef struct
-	{
-		char  charCmd;
-		chars* charAddress;
-	}charCmd;
+command_list* add_new_command_list(command_list* list, command* com)
+{
+    command_list* previous_comnd;
+    if (!list)
+    {
+        list = (command_list*)malloc(sizeof(command_list));
+        list->next = NULL;
+        list->com = com;
+        return list;
+    }
+    previous_comnd = (command_list*)malloc(sizeof(command_list));
+    previous_comnd->next = list;
+    previous_comnd->com = com;
+    return previous_comnd;
+}
 
-	/*Type definition of struct error message that have string with pointer to error message
-	and pointer to his address in memory that save place array of 100 index's*/
-	typedef struct
-	{
-		char* stringCmd; 
-		strings* strAddress;
-	}strCmd;
+command* merege_comand(command* head, command* tail)
+{
+    command* last_comnd;
+    if (!head)
+        return tail;
+    last_comnd = get_last_command(head);
+    last_comnd->next = tail;
+    return head;
+}
 
-	/*Type definition of struct error message that have string with pointer to error message
-	and pointer to his address in memory that save place array of 100 index's*/
-	typedef struct
-	{
-		char* genString;
-		genErrors* genAddress;
-	}errGenMsg;
+command* get_last_command(command* head)
+{
+    command* last_comnd = head;
+    while (last_comnd->next)
+        last_comnd = last_comnd->next;
+    return last_comnd;
+}
 
-	/*Error messages*/
-	errGenMsg genMessages[] = {
-					{"ERROR: unknown variable, not defined in the symbol table\n",&GENERR0},       /*message 0*/
-					{"cast from float to int ERROR!  \n",&GENERR1},               /*message 1*/
-																			
-	};
-	/*to no rewrite for float and int i gave same command and a type so that
-	i can just write each case togther insted of seprate */
-	/*Chars*/
-	charCmd genChars[] = {
-					{'I',&CHAR0},               /* int*/
-					{'R',&CHAR1},              /*float(real) 1*/
-					{'N',&CHAR2},              /*not */
-					{'E',&CHAR3},              /*equal 3*/
-					{'*',&CHAR4},              /*temp number to add label can be deleted and changed  */
-					{'J',&CHAR5}              /* jump*/
-	};
-	/*check to change the jmpz from mpz  */
-	/*Strings*/
-	strCmd genStrings[] = {/*delete getStrings[0] change eachse genStrings[i] to genStrings[i-1] */
-							/*string 0* can be deleted*/
-					{"1",&STR1},              /*string 1 this is to check if junp or not ususally change it no needed */
-					{"TOR",&STR2},              /*string 2 */
-					{"ASN",&STR3},              /*string 3*/
-					{"TOI",&STR4},              /*string 4*/
-					{"ADD",&STR5},              /*string 5*/
-					{"SUB",&STR6},              /*string 6*/
-					{"DIV",&STR7},              /*string 7*/
-					{"MLT",&STR8},              /*string 8*/
-					{"EQL",&STR9},              /*string 9*/
-					{"NQL",&STR10},              /*string 10*/
-					{"GRT",&STR11},              /*string 11*/
-					{"LSS",&STR12},              /*string 12*/
-					{"MPZ",&STR13},              /*string 13*/            
-	};
+command* translate_comand(command* head, char type, char* com, char* firstArg, char* secondArg, char* thirdArg)
+{
+    command* new_comnd, *previous_comnd;
+    if (!head)
+    {
+        head = (command*)malloc(sizeof(command));
+        new_comnd = head;
+    }
+    else
+    {
+        previous_comnd = get_last_command(head);
+        new_comnd = (command*)malloc(sizeof(command));
+        previous_comnd->next = new_comnd;
+    }
+    sprintf(new_comnd->com, "%c%s", type, com);
+    sprintf(new_comnd->firstArg, "%s", firstArg);
+    sprintf(new_comnd->secondArg, "%s", secondArg);
+    sprintf(new_comnd->thirdArg, "%s", thirdArg);
+    new_comnd->next = NULL;
+    return head;
+}
 
-	int labelsCount = 0;
+command* add_assign_commadn(char* var, char* exp, char expType, command* expHead)
+{
+    var_node* symbol = NULL;
+    command* head = NULL;
+    free_state(exp);
 
-	/*Accepts two pointers to heads of command lists
-	and merged them and return merged command list*/
-	command_list* merge_comnd_list(command_list* head, command_list* tail)
-	{
-		command_list* last = head;
+    if (!(symbol = search_varible(var)))
+        printf("ERROR: unknown variable, not defined in the symbol table\n");
+    else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)
+        printf("cast from float to int ERROR!  \n");
+    else
+    {
+        if (symbol->type == genChars[1].charCmd && expType == genChars[0].charCmd)
+            return translate_comand(expHead, genChars[0].charCmd, genStrings[1].stringCmd, var, exp, " ");
+        if (!expHead)
+            return translate_comand(NULL, symbol->type, genStrings[2].stringCmd, var, exp, " ");
+        rename_argument(get_last_command(expHead), var);
+        return expHead;
+    }
+    return NULL;
+}
 
-		if (!head)
-			return tail;
-		while (last->next)
-			last = last->next;
-		last->next = tail;
-		return head;
-	}
+command* build_arithmetic_command(char op, char type, char* last, char* firstArgLast, char* secondArgLast, char firstType, char secondType, command* firstHead, command* secondHead)
+{
+    command* head = NULL;
+    var_node* symbol;
+    if (firstType == genChars[0].charCmd && secondType == genChars[1].charCmd)
+        firstHead = convert_to_float(firstHead, firstArgLast);
+    else if (secondType == genChars[0].charCmd && firstType == genChars[1].charCmd)
+        secondHead = convert_to_float(secondHead, secondArgLast);
+    free_state(firstArgLast);
+    free_state(secondArgLast);
+    head = merege_comand(firstHead, secondHead);
+    symbol = add_temp_var(type);
+    strcpy(last, symbol->name);
+    return build_math_operator_command(op, head, type, symbol->name, firstArgLast, secondArgLast);
+}
 
-	/*Accepts pointers to command list and row command heads,
-	merged them and return merged command list with this row command*/
-	command_list* add_new_command_list(command_list* list, command* com)
-	{
-		command_list* previous_comnd;
+command* build_math_operator_command(char op, command* head, char type, char* firstArg, char* secondArg, char* thirdArg)
+{
+    switch (op)
+    {
+    case '+':
+        return translate_comand(head, type, genStrings[4].stringCmd, firstArg, secondArg, thirdArg);
+    case '-':
+        return translate_comand(head, type, genStrings[5].stringCmd, firstArg, secondArg, thirdArg);
+    case '/':
+        return translate_comand(head, type, genStrings[6].stringCmd, firstArg, secondArg, thirdArg);
+    default:
+        return translate_comand(head, type, genStrings[7].stringCmd, firstArg, secondArg, thirdArg);
+    }
+}
 
-		if (!list)
-		{
-			list = (command_list*)malloc(sizeof(command_list));
-			list->next = NULL;
-			list->com = com;
-			return list;
-		}
-		previous_comnd = (command_list*)malloc(sizeof(command_list));
-		previous_comnd->next = list;
-		previous_comnd->com = com;
-		return previous_comnd;
-	}
+command* build_relop_command(int relopType, char* firstVar, char* secondVar, command* firstHead, command* secondHead, char compareType)
+{
+    command* head;
+    var_node* var;
+    head = merege_comand(firstHead, secondHead);
+    free_state(firstVar);
+    free_state(secondVar);
+    var = add_temp_var(genChars[0].charCmd);
+    switch (relopType)
+    {
+    case equal:
+        head = translate_comand(head, compareType, genStrings[8].stringCmd, var->name, firstVar, secondVar);
+        break;
+    case notEqual:
+        head = translate_comand(head, compareType, genStrings[9].stringCmd, var->name, firstVar, secondVar);
+        break;
+    case bigger:
+        head = translate_comand(head, compareType, genStrings[10].stringCmd, var->name, firstVar, secondVar);
+        break;
+    case smaller:
+        head = translate_comand(head, compareType, genStrings[11].stringCmd, var->name, firstVar, secondVar);
+        break;
+    case biggerOrEqual:
+        head = translate_comand(head, compareType, genStrings[11].stringCmd, var->name, firstVar, secondVar);
+        head = flip_command(head, var->name);
+        break;
+    case smallerOrEqual:
+        head = translate_comand(head, compareType, genStrings[10].stringCmd, var->name, firstVar, secondVar);
+        head = flip_command(head, var->name);
+        break;
+    }
+    head = translate_comand(head, genChars[5].charCmd, genStrings[12].stringCmd, " ", var->name, " ");
+    free_state(var->name);
+    return head;
+}
 
-	/*Accepts pointers two heads commands and merged them and
-	return merged command */
-	command* merege_comand(command* head, command* tail)
-	{
-		command* last_comnd;
+command* flip_command(command* head, char* lastVar)
+{
+    command* last = get_last_command(head);
+    if (!strcmp(last->com + 1, genStrings[8].stringCmd)) { // EQL (==)
+        *((last->com) + 1) = genChars[2].charCmd; // Change to NQL (!=)
+    }
+    else if (!strcmp(last->com + 1, genStrings[9].stringCmd)) { // NQL (!=)
+        *((last->com) + 1) = genChars[3].charCmd; // Change to EQL (==)
+    }
+    else { // For >= or <=
+        head = translate_comand(head, genChars[0].charCmd, genStrings[5].stringCmd, lastVar, genStrings[0].stringCmd, lastVar);
+    }
+    return head;
+}
 
-		if (!head)
-			return tail;
-		last_comnd = get_last_command(head);
-		last_comnd->next = tail;
-		return head;
-	}
+command* add_label(command* head)
+{
+    char buffer[ARGLEN];
+    labelsCount++;
+    sprintf(buffer, "%d", labelsCount);
+    return translate_comand(head, genChars[4].charCmd, buffer, " ", " ", " ");
+}
 
-	/*Accepts pointer to head command and
-	return last element of command */
-	command *get_last_command(command *head)
-	{
-		command *last_comnd = head;
-		while(last_comnd->next)
-			last_comnd = last_comnd->next;
-		return last_comnd;
-	}
+command* convert_to_float(command* head, char* last)
+{
+    var_node* commandName;
+    commandName = add_temp_var(genChars[1].charCmd);
+    head = translate_comand(head, genChars[0].charCmd, genStrings[1].stringCmd, commandName->name, last, " ");
+    free_state(last);
+    strcpy(last, commandName->name);
+    return head;
+}
 
-	/*Accepts data of command and create quad command that add to
-	command list and return pointer to head of this command*/
-	command *translate_comand(command *head, char type, char *com, char *firstArg, char* secondArg, char *thirdArg)
-	{
-		// if(strcmp(com, "MPZ") == 0||strcmp(com, "UMP") == 0){{
-			
-		// 	printf("Type: %c\n", type);
-		// 	printf("Command: %s\n", com);
-		// 	printf("First argument: %s\n", firstArg ? firstArg : "NULL");
-		// 	printf("Second argument: %s\n", secondArg ? secondArg : "NULL");
-		// 	printf("Third argument: %s\n", thirdArg ? thirdArg : "NULL");
-		// }}
-		command *new_comnd, *previous_comnd;
+command* convert_to_int(command* head, char* last)
+{
+    var_node* commandName;
+    commandName = add_temp_var(genChars[0].charCmd);
+    head = translate_comand(head, genChars[1].charCmd, genStrings[3].stringCmd, commandName->name, last, " ");
+    free_state(last);
+    strcpy(last, commandName->name);
+    return head;
+}
 
-		if( !head )
-		{
-			head = (command *)malloc(sizeof(command));
-			new_comnd = head;
-		}
-		else
-		{
-			previous_comnd = get_last_command( head );
-			new_comnd = (command *)malloc(sizeof(command));
-			previous_comnd->next = new_comnd;
-		}
-		sprintf(new_comnd->com, "%c%s", type, com);
-		sprintf(new_comnd->firstArg, "%s", firstArg);
-		sprintf(new_comnd->secondArg, "%s", secondArg);
-		sprintf(new_comnd->thirdArg, "%s", thirdArg);
-		new_comnd->next = NULL;
-		return head;
-	}
+char type_decider(char type1, char type2)
+{
+    if (type1 == genChars[1].charCmd || type2 == genChars[1].charCmd)
+        return genChars[1].charCmd;
+    return genChars[0].charCmd;
+}
 
-	/*Accepts data of assignment command and create quad command that add to
-	command list and return pointer to head of this command*/
-	command* add_assign_commadn(char* var, char* exp, char expType, command* expHead)
-	{
-		var_node* symbol = NULL;
-		command* head = NULL;
-		free_state(exp);
+int cast(int castOp)
+{
+    int number = 0;
+    switch (castOp)
+    {
+    case castToInt:
+        number = 1;
+        break;
+    case castToFloat:
+        number = 2;
+        break;
+    }
+    return number;
+}
 
-		/*check exsist -> check cast -> assign  */
-		if (!(symbol = search_varible(var))) /*check exsistence of varible (called before) */
-			printf("%s",genMessages[0].genString);/*print error*/
-		else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)/*check types of */
-			printf("%s",genMessages[1].genString);
-		else
-		{
-			if (symbol->type == genChars[1].charCmd && expType == genChars[0].charCmd)
-				return translate_comand(expHead, genChars[0].charCmd, genStrings[1].stringCmd, var, exp, " ");
-			if (!expHead)
-				return translate_comand(NULL, symbol->type, genStrings[2].stringCmd, var, exp, " ");
-			rename_argument(get_last_command(expHead), var);
-			return expHead;
-		}
-		return NULL;
-	}
+void update_list_to_label(command_list* head, command* label)
+{
+    command_list* next;
+    while (head)
+    {
+        next = head->next;
+        rename_argument(head->com, label->com);
+        free(head);
+        head = next;
+    }
+}
 
-	/*Accepts data of arithmetic command and create quad command that add to
-	command list and return pointer to head of this command*/
-	command* build_arithmetic_command (char op, char type, char* last, char* firstArgLast, char* secondArgLast, char firstType, char secondType, command* firstHead, command* secondHead)
-	{
-		command* head = NULL;
-		var_node* symbol;
-		if (firstType == genChars[0].charCmd && secondType == genChars[1].charCmd) 
-			firstHead = convert_to_float(firstHead, firstArgLast);
-		else if (secondType == genChars[0].charCmd && firstType == genChars[1].charCmd)
-			secondHead = convert_to_float(secondHead, secondArgLast);
-		free_state(firstArgLast);
-		free_state(secondArgLast);
-		head = merege_comand(firstHead, secondHead);
-		symbol = add_temp_var(type);
-		strcpy(last, symbol->name);
-		return build_math_operator_command (op, head, type, symbol->name, firstArgLast, secondArgLast);
+void rename_argument(command* com, char* newArg)
+{
+    free_state(com->firstArg);
+    sprintf(com->firstArg, "%s", newArg);
+}
 
-	}
+void command_print(command* head)
+{
+    int commandsCounter = 1;
+    int lables[LABELS];
+    command* start = head;
+    while (start)
+    {
+        if (*(start->com) == genChars[4].charCmd)
+            lables[atoi(1 + start->com)] = commandsCounter;
+        else
+            ++commandsCounter;
+        start = start->next;
+    }
+    while (head)
+    {
+        if (*(head->com) != genChars[4].charCmd)
+        {
+            if (*(head->firstArg) == genChars[4].charCmd)
+                sprintf(head->firstArg, "%d", lables[atoi(1 + head->firstArg)]);
+            fprintf(quad, "%s\t%s\t%s\t%s\n", head->com, head->firstArg, head->secondArg, head->thirdArg);
+        }
+        head = head->next;
+    }
+}
 
-	/*Accepts data of addop or mulop command and create quad command that add to
-	command list and return pointer to head of this command*/
-	command* build_math_operator_command (char op, command* head, char type, char* firstArg, char* secondArg, char* thirdArg)
-	{
-		switch (op)
-		{
-		case '+':
-			return translate_comand(head, type, genStrings[4].stringCmd, firstArg, secondArg, thirdArg);
-		case '-':
-			return translate_comand(head, type, genStrings[5].stringCmd, firstArg, secondArg, thirdArg);
-		case '/':
-			return translate_comand(head, type, genStrings[6].stringCmd, firstArg, secondArg, thirdArg);
-		default:
-			return translate_comand(head, type, genStrings[7].stringCmd, firstArg, secondArg, thirdArg);
-		}
-	}
-	
-	/*Accepts data of relop command and create quad command that add to
-	command list and return pointer to head of this command*/
-	command* build_relop_command (int relopType, char* firstVar, char* secondVar, command* firstHead, command* secondHead, char compareType)
-	{
-					
-	//	printf("buld relpo !!");
-		command* head;
-		var_node* var;
-		head = merege_comand(firstHead, secondHead);
-		free_state(firstVar);
-		free_state(secondVar);
-		var = add_temp_var(genChars[0].charCmd);/*generate var for use if needed */
-		switch (relopType)
-		{
-		case equal:
-			head = translate_comand(head, compareType, genStrings[8].stringCmd, var->name, firstVar, secondVar);
-			break;
-		case notEqual:
-			head = translate_comand(head, compareType, genStrings[9].stringCmd, var->name, firstVar, secondVar);
-			break;
-		case bigger:
-			head = translate_comand(head, compareType, genStrings[10].stringCmd, var->name, firstVar, secondVar);
-			break;
-		case smaller:
-			head = translate_comand(head, compareType, genStrings[11].stringCmd, var->name, firstVar, secondVar);
-			break;
-		case biggerOrEqual:
-			head = translate_comand(head, compareType, genStrings[11].stringCmd, var->name, firstVar, secondVar);
-			head = flip_command (head, var->name);
-			break;
-		case smallerOrEqual:
-			head = translate_comand(head, compareType, genStrings[10].stringCmd, var->name, firstVar, secondVar);
-			head = flip_command (head, var->name);
-			break;
-		}
-		head = translate_comand(head, genChars[5].charCmd, genStrings[12].stringCmd, " ", var->name, " ");
-		free_state(var->name);
-		return head;
-	}
-
-	/*Accepts pointer to head command and temp variable.If command smaller or equal
-		program do reverse and to do command bigger and then doing -1 so we accepts 
-		reverse command smaller or equal what we need*/
-		command* flip_command(command* head, char* lastVar) {
-			command* last = get_last_command(head);	
-			if (!strcmp(last->com + 1, genStrings[8].stringCmd)) { // EQL (==)
-				*((last->com) + 1) = genChars[2].charCmd; // Change to NQL (!=)
-			}
-			else if (!strcmp(last->com + 1, genStrings[9].stringCmd)) { // NQL (!=)
-				*((last->com) + 1) = genChars[3].charCmd; // Change to EQL (==)
-			}
-			else { // For >= or <=
-				head = translate_comand(head, genChars[0].charCmd, genStrings[5].stringCmd, lastVar, genStrings[0].stringCmd, lastVar);
-			}
-		
-			return head;
-		}
-	/*Accepts pointer to head of command and create ladel and
-		return pointer to command with created label*/
-	command *add_label(command *head)
-	{
-		char buffer[ARGLEN];
-		//printf("adds label\n");
-		labelsCount++;
-		sprintf(buffer, "%d", labelsCount); /*itoa here using sprintf*/
-		return translate_comand(head,genChars[4].charCmd, buffer, " ", " ", " ");
-	}
-
-	/*Accept pointer to command head take last element and convert this
-		command to float command and return and converted command*/
-	command* convert_to_float(command* head, char* last)
-	{
-	 		var_node* commandName;
-
-		commandName = add_temp_var(genChars[1].charCmd);
-		head = translate_comand(head, genChars[0].charCmd, genStrings[1].stringCmd, commandName->name, last, " ");
-		free_state(last);
-		strcpy(last, commandName->name);
-		return head;
-	}
-
-	/*Accept pointer to command head take last element and convert this
-		command to integer command and return and converted command*/
-	command* convert_to_int(command* head, char* last)
-	{
-		var_node* commandName;
-
-		commandName = add_temp_var(genChars[0].charCmd);
-		head = translate_comand(head, genChars[1].charCmd, genStrings[3].stringCmd, commandName->name, last, " ");
-		free_state(last);
-		strcpy(last, commandName->name);
-		return head;
-	}
-
-	/*	Accepts two types and decides which type need to return*/
-	char type_decider (char type1, char type2)
-	{
-		if (type1 == genChars[1].charCmd || type2 == genChars[1].charCmd)
-			return genChars[1].charCmd;
-		return genChars[0].charCmd;
-	}
-
-	/*Accepts number and by this number function tell as if cast is
-	float or int.Return number which that point what kind of cast.*/
-	int cast(int castOp)
-	{
-		int number = 0;
-		switch (castOp)
-		{
-		case castToInt:
-			number = 1;
-			break;
-		case castToFloat:
-			number = 2;
-			break;
-		}
-		return number;
-	}
-
-	/*Accept pointer to list of commands and pointer of label command and
-	rename first argument of all commands list according to label*/
-	void update_list_to_label(command_list* head, command* label)
-	{
-		command_list* next;
-
-		while (head)
-		{
-			next = head->next;
-			rename_argument(head->com, label->com);
-			free(head);
-			head = next;
-		}
-	}
-
-	/*Accept pointer to command and
-	rename his first argument*/
-	void rename_argument(command* com, char* newArg)
-	{
-		free_state(com->firstArg);
-		sprintf(com->firstArg, "%s", newArg);
-	}
-
-	/*Accept pointer to head of linked list and
-	prints all list of commands to file.qud*/
-	void command_print(command* head)
-	{
-		int commandsCounter = 1;
-		int lables[LABELS];
-		command* start = head;
-
-		while (start)
-		{
-			if (*(start->com) == genChars[4].charCmd)
-			{
-				lables[atoi(1 + start->com)] = commandsCounter;
-			}
-			else
-				++commandsCounter;
-			start = start->next;
-		}
-		while (head)
-		{
-			if (*(head->com) != genChars[4].charCmd) 
-			{
-				if (*(head->firstArg) == genChars[4].charCmd)
-					sprintf(head->firstArg, "%d", lables[atoi(1 + head->firstArg)]);
-				fprintf(quad, "%s\t%s\t%s\t%s\n", head->com, head->firstArg, head->secondArg, head->thirdArg);
-			}
-			head = head->next;
-		}
-	}
-
-	/*Accept pointer to head of linked list and
-	free all list of commands*/
-	void free_list(command *head)
-	{
-		command *current = head;
-		
-		while(head != NULL)
-		{
-			current = head;
-			head = head->next;
-			free(current);
-		}
-	}
+void free_list(command* head)
+{
+    command* current = head;
+    while (head != NULL)
+    {
+        current = head;
+        head = head->next;
+        free(current);
+    }
+}

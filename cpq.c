@@ -1,8 +1,7 @@
 #include "cpq.h"
 
 
-/* New error messages for cpq */
-
+/*error messeges*/
 static void cpqReportError(const char *msg) {
     fprintf(stderr, "%s", msg);
 }
@@ -19,13 +18,14 @@ FILE* openFile(char* name, char* type) {
 int main(int argc, char* argv[]) {
     char* name;
     char* ext = NULL; 
+
     if (argc != 2) {
         cpqReportError(cpqMessages[1]);
         return 0;
     }
     name = argv[1];
     ext = argv[1] + strlen(argv[1]) - LENEXT;
-    if (!strcmp(ext, ".ou") || !strcmp(ext, ".OU")) {
+    if (!strcmp(ext, ".ou") || !strcmp(ext, ".OU")) {   
         if (!(yyin = openFile(argv[1], "r")))
             return 0;
         
@@ -36,14 +36,19 @@ int main(int argc, char* argv[]) {
             return 0;
             
         if (yyparse() || error_number) {
+          
             fclose(quad);
             remove(name);
+            fclose(yyin);
             cpqReportError(cpqMessages[2]);
+            
         }
         else{
+            printf("Success ^-^\n ");
         fclose(yyin);
         fclose(quad);
         }
+
         return 1;
     }
     cpqReportError(cpqMessages[3]);

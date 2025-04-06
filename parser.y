@@ -1,30 +1,41 @@
 %{
 #include <stdio.h>
 #include <malloc.h>
+#include <stdarg.h> /* Added for variable argument handling */
 #include "symboltab.h"
 #include "translator.h"
 
 extern int yylex(void);
 int yyerror(const char *s);
-extern int line;
-command_list *case_jumps = NULL; /* For tracking case jumps */
-int number = 0; /* Counter for numeric values */
+extern int line; /* Defined in lexer, tracks current line number */
+command_list *case_jumps = NULL; /* For tracking case jumps in switch statements */
+int number = 0; /* Counter for cast operations */
 int error_number = 0; /* Counter for errors */
-var_node *current_varible = NULL, *next_varible = NULL; /* Variables for symbol table */
+var_node *current_variable = NULL, *next_variable = NULL; /* Symbol table variables */
 command *current_command = NULL; /* Current command in the command list */
 command_list *temp_link = NULL; /* Temporary link for command lists */
 char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
+
+/* Helper function to report errors and increment error_number */
+void report_error(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    fprintf(stderr, "ERROR: line %d: ", line - 1);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    error_number++;
+}
 %}
 
-%define parse.error verbose
+%define parse.error verbose /* Enable detailed error messages */
 
 %union
 {
     struct number {
         char value[VARLEN]; /* Value of a number */
-        char type; /* Type of the number (INT or FLOAT) */
+        char type; /* Type of the number (I for int, R for float) */
     } num;
 
     struct exp {
@@ -40,11 +51,11 @@ char case_val[10]; /* Array to store case values */
     } boolean;
 
     char id[VARLEN]; /* Identifier name */
-    char type; /* Type of a variable or expression */
-    char op; /* Arithmetic or logical operator */
+    char type; /* Type of a variable or expression (I or R) */
+    char op; /* Arithmetic operator */
     char cast_op; /* Cast operator */
     command *stmt; /* Statement command */
-    int relop; /* Relational operator */
+    int relop; /* Relational operator code */
 }
 
 %type <type> type
@@ -68,10 +79,10 @@ program: declarations stmt_block
 {
     $2 = translate_comand($2, 'H', "ALT", "", "", "");
     command_print($2);
-    free_tree();
-    free_list($2);
+    free_tree(); /* Free symbol table */
+    free_list($2); /* Free command list */
 }
-| error { yyerrok; yyclearin; } /* Recover from program-level errors without semicolon */
+| error { yyerrok; yyclearin; } /* Recover from top-level errors */
 ;
 
 declarations: declarations declaration
@@ -79,16 +90,16 @@ declarations: declarations declaration
 ;
 
 declaration: idlist ':' type { set_varible_type($3); } ';'
-| idlist ':' error { yyerrok; yyclearin; } /* Recover from type errors */
+| idlist ':' error { report_error("invalid type\n"); yyerrok; yyclearin; }
 ;
 
-type: INT { $$ = $1; }
-| FLOAT { $$ = $1; }
+type: INT { $$ = $1; } /* 'I' from lexer */
+| FLOAT { $$ = $1; } /* 'R' from lexer */
 ;
 
 idlist: idlist ',' ID { set_varible_name($3); }
 | ID { set_varible_name($1); }
-| idlist ',' error { yyerrok; yyclearin; } /* Recover from idlist errors */
+| idlist ',' error { report_error("invalid identifier in list\n"); yyerrok; yyclearin; }
 ;
 
 stmt: assignment_stmt { $$ = $1; }
@@ -99,33 +110,35 @@ stmt: assignment_stmt { $$ = $1; }
 | switch_stmt { $$ = $1; }
 | break_stmt { $$ = $1; }
 | stmt_block { $$ = $1; }
-| error { yyerrok; yyclearin; $$ = NULL; } /* Recover after any statement error */
+| ID { report_error("incomplete statement starting with ID '%s'\n", $1); $$ = NULL; }
+| NUM { report_error("unexpected number '%s'\n", $1.value); $$ = NULL; }
+| error { yyerrok; yyclearin; $$ = NULL; } /* yyerror is called automatically */
 ;
 
 assignment_stmt: ID '=' expression ';'
 {
     $$ = add_assign_commadn($1, $3.last, $3.type, $3.head);
 }
-| ID '=' expression { fprintf(stderr, "ERROR: line %d: missing semicolon after assignment\n", line-1); $$ = NULL; }
+| ID '=' expression { report_error("missing semicolon after assignment\n"); $$ = NULL; }
 ;
 
 input_stmt: INPUT '(' ID ')' ';'
 {
     $$ = NULL;
-    if (!(current_varible = search_varible($3)))
-        fprintf(stderr, "ERROR: unknown variable, not defined in the symbol table");
+    if (!(current_variable = search_varible($3)))
+        report_error("unknown variable '%s', not defined in symbol table\n", $3);
     else
-        $$ = translate_comand(NULL, current_varible->type, "INP", current_varible->name, "", "");
+        $$ = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
 }
-| INPUT '(' ID ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after input statement\n", line-1); $$ = NULL; }
+| INPUT '(' ID ')' { report_error("missing semicolon after input statement\n"); $$ = NULL; }
 ;
 
 output_stmt: OUTPUT '(' expression ')' ';'
 {
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
-    free_state($3.last);
+    free_state($3.last); /* Mark variable as free if temporary */
 }
-| OUTPUT '(' expression ')' { fprintf(stderr, "ERROR: line %d: missing semicolon after output statement\n", line-1); $$ = NULL; }
+| OUTPUT '(' expression ')' { report_error("missing semicolon after output statement\n"); $$ = NULL; }
 ;
 
 if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
@@ -139,9 +152,7 @@ if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
     $$ = add_label($$);
     update_list_to_label(temp_link, get_last_command($$));
 }
-| IF '(' error ')' stmt ELSE stmt { yyerrok; yyclearin; $$ = NULL; } /* Recover from condition errors */
-| IF '(' boolexpr ')' error ELSE stmt { yyerrok; yyclearin; $$ = NULL; } /* Recover from then-part errors */
-| IF '(' boolexpr ')' stmt ELSE error { yyerrok; yyclearin; $$ = NULL; } /* Recover from else-part errors */
+| IF '(' error ')' stmt ELSE stmt { report_error("invalid condition in if\n"); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 while_stmt: WHILE '(' boolexpr ')' stmt
@@ -155,13 +166,12 @@ while_stmt: WHILE '(' boolexpr ')' stmt
     $$ = add_label($$);
     update_list_to_label($3.false, get_last_command($$));
 }
-| WHILE '(' error ')' stmt { yyerrok; yyclearin; $$ = NULL; } /* Recover from condition errors */
-| WHILE '(' boolexpr ')' error { yyerrok; yyclearin; $$ = NULL; } /* Recover from body errors */
+| WHILE '(' error ')' stmt { report_error("invalid condition in while\n"); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
-    next_varible = add_temp_var(current_varible->type);
+    next_variable = add_temp_var(current_variable ? current_variable->type : 'I'); /* Default to int if no current var */
     $3.head = merege_comand($3.head, $6);
     temp_link = add_new_command_list(NULL, get_last_command($3.head));
     $3.head = add_label($3.head);
@@ -174,26 +184,17 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 }
 | SWITCH '(' expression ')' '{' caselist '}'
 {
-    fprintf(stderr, "ERROR: line %d: missing DEFAULT in switch statement\n", line-1);
+    report_error("missing DEFAULT in switch statement\n");
     $$ = NULL;
 }
-| SWITCH '(' error ')' '{' caselist DEFAULT ':' stmtlist '}' { 
-    yyerrok; yyclearin;
-     $$ = NULL;
-     }
-| SWITCH '(' expression ')' '{' error DEFAULT ':' stmtlist '}' { 
-    yyerrok; 
-    yyclearin; 
-    $$ = NULL; }
 ;
-
 
 caselist: caselist CASE NUM ':' stmtlist
 {
-    num = $3.value;
-    next_varible = add_temp_var(current_varible->type);
-    $$ = translate_comand($1, current_varible->type, "EQL", next_varible->name, current_varible->name, num);
-    $$ = translate_comand($$, 'J', "MPZ", "", next_varible->name, "");
+    num = $1 ? $3.value : $3.value; /* Use NUM value directly */
+    next_variable = add_temp_var(current_variable ? current_variable->type : 'I');
+    $$ = translate_comand($1, current_variable ? current_variable->type : 'I', "EQL", next_variable->name, current_variable ? current_variable->name : "", num);
+    $$ = translate_comand($$, 'J', "MPZ", "", next_variable->name, "");
     temp_link = add_new_command_list(NULL, get_last_command($$));
     $$ = merege_comand($$, $5);
     $$ = translate_comand($$, 'J', "UMP", "", "", "");
@@ -202,20 +203,19 @@ caselist: caselist CASE NUM ':' stmtlist
     update_list_to_label(temp_link, get_last_command($$));
 }
 | /* empty */ { $$ = NULL; case_jumps = NULL; }
-| caselist CASE error ':' stmtlist { yyerrok; yyclearin; $$ = $1; } /* Recover from case value errors */
 ;
 
 break_stmt: BREAK ';' { $$ = NULL; }
-| BREAK { fprintf(stderr, "ERROR: line %d: missing semicolon after break\n", line-1); $$ = NULL; }
+| BREAK { report_error("missing semicolon after break\n"); $$ = NULL; }
 ;
 
 stmt_block: '{' stmtlist '}' { $$ = $2; }
-| '{' error '}' { yyerrok; yyclearin; $$ = NULL; } /* Recover from block errors */
+| '{' error '}' { report_error("invalid statement block\n"); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 stmtlist: stmtlist stmt { $$ = merege_comand($1, $2); }
 | /* empty */ { $$ = NULL; }
-| stmtlist error { yyerrok; yyclearin; $$ = $1; } /* Recover after each statement in list */
+| stmtlist error { report_error("error in statement list\n"); yyerrok; yyclearin; $$ = $1; }
 ;
 
 boolexpr: boolexpr OR boolterm
@@ -225,12 +225,9 @@ boolexpr: boolexpr OR boolterm
     $$.head = add_label($$.head);
     update_list_to_label($1.false, get_last_command($$.head));
     $$.head = merege_comand($$.head, $3.head);
-    add_label($$.head);
-    update_list_to_label(temp_link, get_last_command($$.head));
     $$.false = $3.false;
 }
 | boolterm { $$.head = $1.head; $$.false = $1.false; }
-| error { yyerrok; yyclearin; $$.head = NULL; $$.false = NULL; } /* Recover from boolean expression errors */
 ;
 
 boolterm: boolterm AND boolfactor
@@ -245,7 +242,7 @@ boolfactor: NOT '(' boolexpr ')'
 {
     $$.head = translate_comand($3.head, 'J', "UMP", "", "", "");
     $$.false = add_new_command_list(NULL, get_last_command($$.head));
-    add_label($$.head);
+    $$.head = add_label($$.head);
     update_list_to_label($3.false, get_last_command($$.head));
 }
 | expression RELOP expression
@@ -283,7 +280,7 @@ factor: '(' expression ')'
 }
 | CAST '(' expression ')'
 {
-    number = cast($1);
+    number = cast($1); /* cast() returns 1 for int, 2 for float */
     if (number == 1 && $3.type == 'R') {
         $$.head = convert_to_int($3.head, $3.last);
         $$.type = 'I';
@@ -299,12 +296,12 @@ factor: '(' expression ')'
 | ID
 {
     $$.head = NULL;
-    if (!(current_varible = search_varible($1))) {
-        fprintf(stderr, "ERROR: unknown variable, not defined in the symbol table");
+    if (!(current_variable = search_varible($1))) {
+        report_error("unknown variable '%s', not defined in symbol table\n", $1);
         $$.type = 0;
     } else {
         strcpy($$.last, $1);
-        $$.type = current_varible->type;
+        $$.type = current_variable->type;
     }
 }
 | NUM
@@ -319,7 +316,6 @@ factor: '(' expression ')'
 
 int yyerror(const char *err)
 {
-    fprintf(stderr, "ERROR: line %d: %s\n", line-1, err);
-    error_number = 1;
+    report_error("%s\n", err);
     return 1;
 }
