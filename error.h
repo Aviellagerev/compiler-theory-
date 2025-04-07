@@ -31,6 +31,8 @@ static const char* error_messeges[] = {
     "cast from float to int ERROR!\n",                                /*error_nesseges[18]*/
     "the varible %s exsists in table \n",                             /*error_nesseges[19]*/                        
     "Identifier '%.*s...' exceeds maximum length of %d characters\n", /*error_messeges[20] */
-    "Unknown token '%s'\n"                                            /*error_messeges[21] */ 
+    "Unknown token '%s'\n",                                            /*error_messeges[21] */ 
+    "Error: Memory allocation failed for new command",
+    
 };
 #endif

@@ -82,18 +82,18 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 32 "parser.y"
+#line 35 "parser.y"
 
     struct number {
-        char value[VARLEN]; /* Value of a number */
-        char type; /* Type of the number (I for int, R for float) */
+        char value[VARLEN]; /* String representation of a numeric value */
+        char type; /* 'I' for int, 'R' for float */
     } num;
 
     struct exp {
-        command *head; /* Head of the command list for expressions */
+        command *head; /* Head of the command list for an expression */
         command_list *false; /* False branch for boolean expressions */
         char last[VARLEN]; /* Last variable or value in the expression */
-        char type; /* Type of the expression */
+        char type; /* Type of the expression ('I' or 'R') */
     } expression;
 
     struct bool {
@@ -102,11 +102,11 @@ union YYSTYPE
     } boolean;
 
     char id[VARLEN]; /* Identifier name */
-    char type; /* Type of a variable or expression (I or R) */
-    char op; /* Arithmetic operator */
-    char cast_op; /* Cast operator */
-    command *stmt; /* Statement command */
-    int relop; /* Relational operator code */
+    char type; /* Type of a variable or expression ('I' or 'R') */
+    char op; /* Arithmetic operator (+, -, *, /) */
+    char cast_op; /* Cast operator (e.g., to int or float) */
+    command *stmt; /* Command representing a statement */
+    int relop; /* Relational operator code (e.g., <, >, ==) */
 
 #line 112 "parser.tab.h"
 

@@ -9,7 +9,8 @@ int line = 1;
 extern  void report_error(const char *format, ...);
 extern const char* error_messeges[];
 %}
-
+%option noinput
+%option nounput
 %x COMMENT
 
 %%
