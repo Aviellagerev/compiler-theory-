@@ -60,6 +60,7 @@
     "stdio.h": "c",
     "error.h": "c",
     "string.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "cpq.h": "c"
   }
 }

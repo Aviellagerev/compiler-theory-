@@ -1,0 +1,27 @@
+IPRT	2		
+IPRT	3		
+IASN	a	5	 
+IGRT	var1	a	38
+ISUB	var1	1	var1
+JMPZ	27	var1	 
+IASN	b	2	 
+IASN	stop	1	 
+IMLT	var1	stop	a
+IDIV	var1	var1	2
+ILSS	var1	b	var1
+JMPZ	21	var1	 
+IDIV	var1	a	b
+IMLT	var1	var1	b
+IEQL	var1	var1	a
+JMPZ	19	var1	 
+IASN	stop	0	 
+JUMP	19		
+IADD	b	b	1
+JUMP	9		
+IEQL	var1	stop	1
+JMPZ	25	var1	 
+IPRT	a		
+JUMP	25		
+IADD	a	a	2
+JUMP	4		
+HALT			
