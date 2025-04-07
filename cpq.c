@@ -6,6 +6,7 @@ static void cpqReportError(const char *msg) {
     fprintf(stderr, "%s", msg);
 }
 
+
 /* Open file function */
 FILE* openFile(char* name, char* type) {
     FILE* file = fopen(name, type);

@@ -69,12 +69,16 @@
 /* First part of user prologue.  */
 #line 1 "parser.y"
 
+    
 #include <stdio.h>
 #include <malloc.h>
 #include <stdarg.h> /* Added for variable argument handling */
+#include "error.h"
 #include "symboltab.h"
 #include "translator.h"
 
+
+extern void report_error(const char *format, ...);
 extern int yylex(void);
 int yyerror(const char *s);
 extern int line; /* Defined in lexer, tracks current line number */
@@ -88,17 +92,10 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
 
-/* Helper function to report errors and increment error_number */
-void report_error(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    fprintf(stderr, "ERROR: line %d: ", line - 1);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    error_number++;
-}
 
-#line 102 "parser.tab.c"
+
+
+#line 99 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -568,12 +565,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    78,    78,    85,    88,    89,    92,    92,    93,    96,
-      97,   100,   101,   102,   105,   106,   107,   108,   109,   110,
-     111,   112,   113,   114,   115,   118,   122,   125,   133,   136,
-     141,   144,   155,   158,   169,   172,   185,   192,   205,   208,
-     209,   212,   213,   216,   217,   218,   221,   230,   233,   238,
-     241,   248,   259,   264,   267,   272,   275,   281,   296,   307
+       0,    75,    75,    82,    85,    86,    89,    89,    90,    93,
+      94,    97,    98,    99,   102,   103,   104,   105,   106,   107,
+     108,   109,   110,   111,   112,   115,   119,   122,   130,   133,
+     138,   141,   152,   155,   166,   169,   182,   189,   202,   205,
+     206,   209,   210,   213,   214,   215,   218,   227,   230,   235,
+     238,   245,   256,   261,   264,   269,   272,   278,   293,   304
 };
 #endif
 
@@ -1484,146 +1481,146 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: declarations stmt_block  */
-#line 79 "parser.y"
+#line 76 "parser.y"
 {
     (yyvsp[0].stmt) = translate_comand((yyvsp[0].stmt), 'H', "ALT", "", "", "");
     command_print((yyvsp[0].stmt));
     free_tree(); /* Free symbol table */
     free_list((yyvsp[0].stmt)); /* Free command list */
 }
-#line 1495 "parser.tab.c"
+#line 1492 "parser.tab.c"
     break;
 
   case 3: /* program: error  */
-#line 85 "parser.y"
+#line 82 "parser.y"
         { yyerrok; yyclearin; }
-#line 1501 "parser.tab.c"
+#line 1498 "parser.tab.c"
     break;
 
   case 6: /* $@1: %empty  */
-#line 92 "parser.y"
+#line 89 "parser.y"
                              { set_varible_type((yyvsp[0].type)); }
-#line 1507 "parser.tab.c"
+#line 1504 "parser.tab.c"
     break;
 
   case 8: /* declaration: idlist ':' error  */
-#line 93 "parser.y"
+#line 90 "parser.y"
                    { report_error("invalid type\n"); yyerrok; yyclearin; }
-#line 1513 "parser.tab.c"
+#line 1510 "parser.tab.c"
     break;
 
   case 9: /* type: INT  */
-#line 96 "parser.y"
+#line 93 "parser.y"
           { (yyval.type) = (yyvsp[0].type); }
-#line 1519 "parser.tab.c"
+#line 1516 "parser.tab.c"
     break;
 
   case 10: /* type: FLOAT  */
-#line 97 "parser.y"
+#line 94 "parser.y"
         { (yyval.type) = (yyvsp[0].type); }
-#line 1525 "parser.tab.c"
+#line 1522 "parser.tab.c"
     break;
 
   case 11: /* idlist: idlist ',' ID  */
-#line 100 "parser.y"
+#line 97 "parser.y"
                       { set_varible_name((yyvsp[0].id)); }
-#line 1531 "parser.tab.c"
+#line 1528 "parser.tab.c"
     break;
 
   case 12: /* idlist: ID  */
-#line 101 "parser.y"
+#line 98 "parser.y"
      { set_varible_name((yyvsp[0].id)); }
-#line 1537 "parser.tab.c"
+#line 1534 "parser.tab.c"
     break;
 
   case 13: /* idlist: idlist ',' error  */
-#line 102 "parser.y"
+#line 99 "parser.y"
                    { report_error("invalid identifier in list\n"); yyerrok; yyclearin; }
-#line 1543 "parser.tab.c"
+#line 1540 "parser.tab.c"
     break;
 
   case 14: /* stmt: assignment_stmt  */
-#line 105 "parser.y"
+#line 102 "parser.y"
                       { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1549 "parser.tab.c"
+#line 1546 "parser.tab.c"
     break;
 
   case 15: /* stmt: input_stmt  */
-#line 106 "parser.y"
+#line 103 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1555 "parser.tab.c"
+#line 1552 "parser.tab.c"
     break;
 
   case 16: /* stmt: output_stmt  */
-#line 107 "parser.y"
+#line 104 "parser.y"
               { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1561 "parser.tab.c"
+#line 1558 "parser.tab.c"
     break;
 
   case 17: /* stmt: if_stmt  */
-#line 108 "parser.y"
+#line 105 "parser.y"
           { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1567 "parser.tab.c"
+#line 1564 "parser.tab.c"
     break;
 
   case 18: /* stmt: while_stmt  */
-#line 109 "parser.y"
+#line 106 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1573 "parser.tab.c"
+#line 1570 "parser.tab.c"
     break;
 
   case 19: /* stmt: switch_stmt  */
-#line 110 "parser.y"
+#line 107 "parser.y"
               { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1579 "parser.tab.c"
+#line 1576 "parser.tab.c"
     break;
 
   case 20: /* stmt: break_stmt  */
-#line 111 "parser.y"
+#line 108 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1585 "parser.tab.c"
+#line 1582 "parser.tab.c"
     break;
 
   case 21: /* stmt: stmt_block  */
-#line 112 "parser.y"
+#line 109 "parser.y"
              { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 1591 "parser.tab.c"
+#line 1588 "parser.tab.c"
     break;
 
   case 22: /* stmt: ID  */
-#line 113 "parser.y"
+#line 110 "parser.y"
      { report_error("incomplete statement starting with ID '%s'\n", (yyvsp[0].id)); (yyval.stmt) = NULL; }
-#line 1597 "parser.tab.c"
+#line 1594 "parser.tab.c"
     break;
 
   case 23: /* stmt: NUM  */
-#line 114 "parser.y"
+#line 111 "parser.y"
       { report_error("unexpected number '%s'\n", (yyvsp[0].num).value); (yyval.stmt) = NULL; }
-#line 1603 "parser.tab.c"
+#line 1600 "parser.tab.c"
     break;
 
   case 24: /* stmt: error  */
-#line 115 "parser.y"
+#line 112 "parser.y"
         { yyerrok; yyclearin; (yyval.stmt) = NULL; }
-#line 1609 "parser.tab.c"
+#line 1606 "parser.tab.c"
     break;
 
   case 25: /* assignment_stmt: ID '=' expression ';'  */
-#line 119 "parser.y"
+#line 116 "parser.y"
 {
     (yyval.stmt) = add_assign_commadn((yyvsp[-3].id), (yyvsp[-1].expression).last, (yyvsp[-1].expression).type, (yyvsp[-1].expression).head);
 }
-#line 1617 "parser.tab.c"
+#line 1614 "parser.tab.c"
     break;
 
   case 26: /* assignment_stmt: ID '=' expression  */
-#line 122 "parser.y"
+#line 119 "parser.y"
                     { report_error("missing semicolon after assignment\n"); (yyval.stmt) = NULL; }
-#line 1623 "parser.tab.c"
+#line 1620 "parser.tab.c"
     break;
 
   case 27: /* input_stmt: INPUT '(' ID ')' ';'  */
-#line 126 "parser.y"
+#line 123 "parser.y"
 {
     (yyval.stmt) = NULL;
     if (!(current_variable = search_varible((yyvsp[-2].id))))
@@ -1631,32 +1628,32 @@ yyreduce:
     else
         (yyval.stmt) = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
 }
-#line 1635 "parser.tab.c"
+#line 1632 "parser.tab.c"
     break;
 
   case 28: /* input_stmt: INPUT '(' ID ')'  */
-#line 133 "parser.y"
+#line 130 "parser.y"
                    { report_error("missing semicolon after input statement\n"); (yyval.stmt) = NULL; }
-#line 1641 "parser.tab.c"
+#line 1638 "parser.tab.c"
     break;
 
   case 29: /* output_stmt: OUTPUT '(' expression ')' ';'  */
-#line 137 "parser.y"
+#line 134 "parser.y"
 {
     (yyval.stmt) = translate_comand((yyvsp[-2].expression).head, (yyvsp[-2].expression).type, "PRT", (yyvsp[-2].expression).last, "", "");
     free_state((yyvsp[-2].expression).last); /* Mark variable as free if temporary */
 }
-#line 1650 "parser.tab.c"
+#line 1647 "parser.tab.c"
     break;
 
   case 30: /* output_stmt: OUTPUT '(' expression ')'  */
-#line 141 "parser.y"
+#line 138 "parser.y"
                             { report_error("missing semicolon after output statement\n"); (yyval.stmt) = NULL; }
-#line 1656 "parser.tab.c"
+#line 1653 "parser.tab.c"
     break;
 
   case 31: /* if_stmt: IF '(' boolexpr ')' stmt ELSE stmt  */
-#line 145 "parser.y"
+#line 142 "parser.y"
 {
     (yyval.stmt) = merege_comand((yyvsp[-4].boolean).head, (yyvsp[-2].stmt));
     (yyval.stmt) = translate_comand((yyval.stmt), 'J', "UMP", "", "", "");
@@ -1667,17 +1664,17 @@ yyreduce:
     (yyval.stmt) = add_label((yyval.stmt));
     update_list_to_label(temp_link, get_last_command((yyval.stmt)));
 }
-#line 1671 "parser.tab.c"
+#line 1668 "parser.tab.c"
     break;
 
   case 32: /* if_stmt: IF '(' error ')' stmt ELSE stmt  */
-#line 155 "parser.y"
+#line 152 "parser.y"
                                   { report_error("invalid condition in if\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
-#line 1677 "parser.tab.c"
+#line 1674 "parser.tab.c"
     break;
 
   case 33: /* while_stmt: WHILE '(' boolexpr ')' stmt  */
-#line 159 "parser.y"
+#line 156 "parser.y"
 {
     (yyval.stmt) = add_label(NULL);
     (yyval.stmt) = merege_comand((yyval.stmt), (yyvsp[-2].boolean).head);
@@ -1688,17 +1685,17 @@ yyreduce:
     (yyval.stmt) = add_label((yyval.stmt));
     update_list_to_label((yyvsp[-2].boolean).false, get_last_command((yyval.stmt)));
 }
-#line 1692 "parser.tab.c"
+#line 1689 "parser.tab.c"
     break;
 
   case 34: /* while_stmt: WHILE '(' error ')' stmt  */
-#line 169 "parser.y"
+#line 166 "parser.y"
                            { report_error("invalid condition in while\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
-#line 1698 "parser.tab.c"
+#line 1695 "parser.tab.c"
     break;
 
   case 35: /* switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'  */
-#line 173 "parser.y"
+#line 170 "parser.y"
 {
     next_variable = add_temp_var(current_variable ? current_variable->type : 'I'); /* Default to int if no current var */
     (yyvsp[-7].expression).head = merege_comand((yyvsp[-7].expression).head, (yyvsp[-4].stmt));
@@ -1711,20 +1708,20 @@ yyreduce:
     case_jumps = NULL;
     (yyval.stmt) = (yyvsp[-7].expression).head;
 }
-#line 1715 "parser.tab.c"
+#line 1712 "parser.tab.c"
     break;
 
   case 36: /* switch_stmt: SWITCH '(' expression ')' '{' caselist '}'  */
-#line 186 "parser.y"
+#line 183 "parser.y"
 {
     report_error("missing DEFAULT in switch statement\n");
     (yyval.stmt) = NULL;
 }
-#line 1724 "parser.tab.c"
+#line 1721 "parser.tab.c"
     break;
 
   case 37: /* caselist: caselist CASE NUM ':' stmtlist  */
-#line 193 "parser.y"
+#line 190 "parser.y"
 {
     num = (yyvsp[-4].stmt) ? (yyvsp[-2].num).value : (yyvsp[-2].num).value; /* Use NUM value directly */
     next_variable = add_temp_var(current_variable ? current_variable->type : 'I');
@@ -1737,59 +1734,59 @@ yyreduce:
     (yyval.stmt) = add_label((yyval.stmt));
     update_list_to_label(temp_link, get_last_command((yyval.stmt)));
 }
-#line 1741 "parser.tab.c"
+#line 1738 "parser.tab.c"
     break;
 
   case 38: /* caselist: %empty  */
-#line 205 "parser.y"
+#line 202 "parser.y"
               { (yyval.stmt) = NULL; case_jumps = NULL; }
-#line 1747 "parser.tab.c"
+#line 1744 "parser.tab.c"
     break;
 
   case 39: /* break_stmt: BREAK ';'  */
-#line 208 "parser.y"
+#line 205 "parser.y"
                       { (yyval.stmt) = NULL; }
-#line 1753 "parser.tab.c"
+#line 1750 "parser.tab.c"
     break;
 
   case 40: /* break_stmt: BREAK  */
-#line 209 "parser.y"
+#line 206 "parser.y"
         { report_error("missing semicolon after break\n"); (yyval.stmt) = NULL; }
-#line 1759 "parser.tab.c"
+#line 1756 "parser.tab.c"
     break;
 
   case 41: /* stmt_block: '{' stmtlist '}'  */
-#line 212 "parser.y"
+#line 209 "parser.y"
                              { (yyval.stmt) = (yyvsp[-1].stmt); }
-#line 1765 "parser.tab.c"
+#line 1762 "parser.tab.c"
     break;
 
   case 42: /* stmt_block: '{' error '}'  */
-#line 213 "parser.y"
+#line 210 "parser.y"
                 { report_error("invalid statement block\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
-#line 1771 "parser.tab.c"
+#line 1768 "parser.tab.c"
     break;
 
   case 43: /* stmtlist: stmtlist stmt  */
-#line 216 "parser.y"
+#line 213 "parser.y"
                         { (yyval.stmt) = merege_comand((yyvsp[-1].stmt), (yyvsp[0].stmt)); }
-#line 1777 "parser.tab.c"
+#line 1774 "parser.tab.c"
     break;
 
   case 44: /* stmtlist: %empty  */
-#line 217 "parser.y"
+#line 214 "parser.y"
               { (yyval.stmt) = NULL; }
-#line 1783 "parser.tab.c"
+#line 1780 "parser.tab.c"
     break;
 
   case 45: /* stmtlist: stmtlist error  */
-#line 218 "parser.y"
+#line 215 "parser.y"
                  { report_error("error in statement list\n"); yyerrok; yyclearin; (yyval.stmt) = (yyvsp[-1].stmt); }
-#line 1789 "parser.tab.c"
+#line 1786 "parser.tab.c"
     break;
 
   case 46: /* boolexpr: boolexpr OR boolterm  */
-#line 222 "parser.y"
+#line 219 "parser.y"
 {
     (yyval.boolean).head = translate_comand((yyvsp[-2].boolean).head, 'J', "UMP", "", "", "");
     temp_link = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
@@ -1798,43 +1795,43 @@ yyreduce:
     (yyval.boolean).head = merege_comand((yyval.boolean).head, (yyvsp[0].boolean).head);
     (yyval.boolean).false = (yyvsp[0].boolean).false;
 }
-#line 1802 "parser.tab.c"
+#line 1799 "parser.tab.c"
     break;
 
   case 47: /* boolexpr: boolterm  */
-#line 230 "parser.y"
+#line 227 "parser.y"
            { (yyval.boolean).head = (yyvsp[0].boolean).head; (yyval.boolean).false = (yyvsp[0].boolean).false; }
-#line 1808 "parser.tab.c"
+#line 1805 "parser.tab.c"
     break;
 
   case 48: /* boolterm: boolterm AND boolfactor  */
-#line 234 "parser.y"
+#line 231 "parser.y"
 {
     (yyval.boolean).head = merege_comand((yyvsp[-2].boolean).head, (yyvsp[0].boolean).head);
     (yyval.boolean).false = merge_comnd_list((yyvsp[-2].boolean).false, (yyvsp[0].boolean).false);
 }
-#line 1817 "parser.tab.c"
+#line 1814 "parser.tab.c"
     break;
 
   case 49: /* boolterm: boolfactor  */
-#line 238 "parser.y"
+#line 235 "parser.y"
              { (yyval.boolean).false = (yyvsp[0].boolean).false; (yyval.boolean).head = (yyvsp[0].boolean).head; }
-#line 1823 "parser.tab.c"
+#line 1820 "parser.tab.c"
     break;
 
   case 50: /* boolfactor: NOT '(' boolexpr ')'  */
-#line 242 "parser.y"
+#line 239 "parser.y"
 {
     (yyval.boolean).head = translate_comand((yyvsp[-1].boolean).head, 'J', "UMP", "", "", "");
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
     (yyval.boolean).head = add_label((yyval.boolean).head);
     update_list_to_label((yyvsp[-1].boolean).false, get_last_command((yyval.boolean).head));
 }
-#line 1834 "parser.tab.c"
+#line 1831 "parser.tab.c"
     break;
 
   case 51: /* boolfactor: expression RELOP expression  */
-#line 249 "parser.y"
+#line 246 "parser.y"
 {
     if ((yyvsp[-2].expression).type == 'I' && (yyvsp[0].expression).type == 'R')
         (yyvsp[-2].expression).head = convert_to_float((yyvsp[-2].expression).head, (yyvsp[-2].expression).last);
@@ -1843,51 +1840,51 @@ yyreduce:
     (yyval.boolean).head = build_relop_command((yyvsp[-1].relop), (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).head, (yyvsp[0].expression).head, type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type));
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
 }
-#line 1847 "parser.tab.c"
+#line 1844 "parser.tab.c"
     break;
 
   case 52: /* expression: expression ADDOP term  */
-#line 260 "parser.y"
+#line 257 "parser.y"
 {
     (yyval.expression).type = type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1856 "parser.tab.c"
+#line 1853 "parser.tab.c"
     break;
 
   case 53: /* expression: term  */
-#line 264 "parser.y"
+#line 261 "parser.y"
        { (yyval.expression).type = (yyvsp[0].expression).type; (yyval.expression).head = (yyvsp[0].expression).head; strcpy((yyval.expression).last, (yyvsp[0].expression).last); }
-#line 1862 "parser.tab.c"
+#line 1859 "parser.tab.c"
     break;
 
   case 54: /* term: term MULOP factor  */
-#line 268 "parser.y"
+#line 265 "parser.y"
 {
     (yyval.expression).type = type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1871 "parser.tab.c"
+#line 1868 "parser.tab.c"
     break;
 
   case 55: /* term: factor  */
-#line 272 "parser.y"
+#line 269 "parser.y"
          { (yyval.expression).type = (yyvsp[0].expression).type; (yyval.expression).head = (yyvsp[0].expression).head; strcpy((yyval.expression).last, (yyvsp[0].expression).last); }
-#line 1877 "parser.tab.c"
+#line 1874 "parser.tab.c"
     break;
 
   case 56: /* factor: '(' expression ')'  */
-#line 276 "parser.y"
+#line 273 "parser.y"
 {
     (yyval.expression).type = (yyvsp[-1].expression).type;
     (yyval.expression).head = (yyvsp[-1].expression).head;
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1887 "parser.tab.c"
+#line 1884 "parser.tab.c"
     break;
 
   case 57: /* factor: CAST '(' expression ')'  */
-#line 282 "parser.y"
+#line 279 "parser.y"
 {
     number = cast((yyvsp[-3].cast_op)); /* cast() returns 1 for int, 2 for float */
     if (number == 1 && (yyvsp[-1].expression).type == 'R') {
@@ -1902,11 +1899,11 @@ yyreduce:
     }
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1906 "parser.tab.c"
+#line 1903 "parser.tab.c"
     break;
 
   case 58: /* factor: ID  */
-#line 297 "parser.y"
+#line 294 "parser.y"
 {
     (yyval.expression).head = NULL;
     if (!(current_variable = search_varible((yyvsp[0].id)))) {
@@ -1917,21 +1914,21 @@ yyreduce:
         (yyval.expression).type = current_variable->type;
     }
 }
-#line 1921 "parser.tab.c"
+#line 1918 "parser.tab.c"
     break;
 
   case 59: /* factor: NUM  */
-#line 308 "parser.y"
+#line 305 "parser.y"
 {
     strcpy((yyval.expression).last, (yyvsp[0].num).value);
     (yyval.expression).type = (yyvsp[0].num).type;
     (yyval.expression).head = NULL;
 }
-#line 1931 "parser.tab.c"
+#line 1928 "parser.tab.c"
     break;
 
 
-#line 1935 "parser.tab.c"
+#line 1932 "parser.tab.c"
 
       default: break;
     }
@@ -2155,7 +2152,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 315 "parser.y"
+#line 312 "parser.y"
 
 
 int yyerror(const char *err)

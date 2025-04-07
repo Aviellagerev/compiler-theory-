@@ -1,10 +1,14 @@
 %{
+    
 #include <stdio.h>
 #include <malloc.h>
 #include <stdarg.h> /* Added for variable argument handling */
+#include "error.h"
 #include "symboltab.h"
 #include "translator.h"
 
+
+extern void report_error(const char *format, ...);
 extern int yylex(void);
 int yyerror(const char *s);
 extern int line; /* Defined in lexer, tracks current line number */
@@ -18,15 +22,8 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
 
-/* Helper function to report errors and increment error_number */
-void report_error(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    fprintf(stderr, "ERROR: line %d: ", line - 1);
-    vfprintf(stderr, format, args);
-    va_end(args);
-    error_number++;
-}
+
+
 %}
 
 %define parse.error verbose /* Enable detailed error messages */

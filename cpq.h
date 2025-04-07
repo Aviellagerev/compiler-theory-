@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdarg.h> /* Added for variable argument handling */
 static const char* cpqMessages[] = {
     "Error: Could not open file\n",      /* messages[0] */
     "Usage: <program> <filename>\n",       /* messages[1] */
@@ -26,5 +26,6 @@ extern int error_number;
 
 /* Function prototype for openFile */
 FILE* openFile(char* name, char* type);
+
 
 #endif /* CPQ_H */

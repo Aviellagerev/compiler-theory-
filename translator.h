@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "error.h"
 /* Assumed macros for argument length and label count.
    Adjust these values as needed for your project. */
 #define ARGLEN 100
@@ -49,7 +50,7 @@ typedef struct {
 } strCmd;
 
 
-
+extern void report_error(const char *format, ...);
 /*--------------------------------------------------------------
  * Function prototypes from translator.c
  *--------------------------------------------------------------*/
@@ -110,7 +111,5 @@ void command_print(command* head);
 
 /* Frees the entire command linked list */
 void free_list(command* head);
-
-
 
 #endif /* TRANSLATOR_H */

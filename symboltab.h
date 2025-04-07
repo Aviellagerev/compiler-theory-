@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "error.h"
 #define VARLEN 32  // Max length of a variable name
 #define TABLE_SIZE 211  // Hash table size (prime number for better distribution)
 
@@ -30,4 +30,5 @@ void set_varible_type(char type);
 void free_state(char* name);
 void free_tree();
 
+extern void report_error(const char *format, ...);
 #endif // SYMBOLTAB_H

@@ -1,20 +1,10 @@
+   /* should print 3  8   16.0   17.0  18.0 (or 19.0 if RTOI rounds up) */    
+ a : float;
+ i : int;
 
-cond : int;
 {
-	input(cond);
-	switch(cond){
-		case 1:
-			output(1);
-			break;
-		case 2:
-			output(2);
-			break;
-		case 3:
-			output(3);
-			break;			
-		default:
-			output(0);
-			break;
-	}
-	
+	a=3.2;
+
+	i = a;
+	output(i);
 }
