@@ -76,7 +76,7 @@ program: declarations stmt_block
 {
     $2 = translate_comand($2, 'H', "ALT", "", "", "");
     command_print($2);
-    free_tree(); /* Free symbol table */
+    free_symbol_table(); /* Free symbol table */
     free_list($2); /* Free command list */
 }
 | error { yyerrok; yyclearin; } /* Recover from top-level errors */
@@ -86,7 +86,7 @@ declarations: declarations declaration
 | /* epsilon */
 ;
 
-declaration: idlist ':' type { set_varible_type($3); } ';'
+declaration: idlist ':' type { set_variable_type($3); } ';'
 | idlist ':' error { report_error(error_messeges[5]); yyerrok; yyclearin; }
 ;
 
@@ -94,8 +94,8 @@ type: INT { $$ = $1; } /* 'I' from lexer */
 | FLOAT { $$ = $1; } /* 'R' from lexer */
 ;
 
-idlist: idlist ',' ID { set_varible_name($3); }
-| ID { set_varible_name($1); }
+idlist: idlist ',' ID { set_variable_name($3); }
+| ID { set_variable_name($1); }
 | idlist ',' error { report_error(error_messeges[6]); yyerrok; yyclearin; }
 ;
 
@@ -122,7 +122,7 @@ assignment_stmt: ID '=' expression ';'
 input_stmt: INPUT '(' ID ')' ';'
 {
     $$ = NULL;
-    if (!(current_variable = search_varible($3)))
+    if (!(current_variable = search_variable($3)))
         report_error(error_messeges[4], $3);
     else
         $$ = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
@@ -133,7 +133,7 @@ input_stmt: INPUT '(' ID ')' ';'
 output_stmt: OUTPUT '(' expression ')' ';'
 {
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
-    free_state($3.last); /* Mark variable as free if temporary */
+    free_variable_state($3.last); /* Mark variable as free if temporary */
 }
 | OUTPUT '(' expression ')' { report_error(error_messeges[10]); $$ = NULL; }
 ;
@@ -295,7 +295,7 @@ factor: '(' expression ')'
 | ID
 {
     $$.head = NULL;
-    if (!(current_variable = search_varible($1))) {
+    if (!(current_variable = search_variable($1))) {
         report_error(error_messeges[4], $1);
         $$.type = 0;
     } else {

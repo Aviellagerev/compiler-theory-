@@ -104,9 +104,9 @@ command* add_assign_commadn(char* var, char* exp, char expType, command* expHead
 {
     var_node* symbol = NULL;
     command* head = NULL;
-    free_state(exp);
+    free_variable_state(exp);
 
-    if (!(symbol = search_varible(var)))
+    if (!(symbol = search_variable(var)))
         report_error(error_messeges[4],var);
     else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)
         report_error(error_messeges[18]);
@@ -130,8 +130,8 @@ command* build_arithmetic_command(char op, char type, char* last, char* firstArg
         firstHead = convert_to_float(firstHead, firstArgLast);
     else if (secondType == genChars[0].charCmd && firstType == genChars[1].charCmd)
         secondHead = convert_to_float(secondHead, secondArgLast);
-    free_state(firstArgLast);
-    free_state(secondArgLast);
+    free_variable_state(firstArgLast);
+    free_variable_state(secondArgLast);
     head = merege_comand(firstHead, secondHead);
     symbol = add_temp_var(type);
     strcpy(last, symbol->name);
@@ -158,8 +158,8 @@ command* build_relop_command(int relopType, char* firstVar, char* secondVar, com
     command* head;
     var_node* var;
     head = merege_comand(firstHead, secondHead);
-    free_state(firstVar);
-    free_state(secondVar);
+    free_variable_state(firstVar);
+    free_variable_state(secondVar);
     var = add_temp_var(genChars[0].charCmd);
     switch (relopType)
     {
@@ -185,7 +185,7 @@ command* build_relop_command(int relopType, char* firstVar, char* secondVar, com
         break;
     }
     head = translate_comand(head, genChars[5].charCmd, genStrings[12].stringCmd, " ", var->name, " ");
-    free_state(var->name);
+    free_variable_state(var->name);
     return head;
 }
 
@@ -217,7 +217,7 @@ command* convert_to_float(command* head, char* last)
     var_node* commandName;
     commandName = add_temp_var(genChars[1].charCmd);
     head = translate_comand(head, genChars[0].charCmd, genStrings[1].stringCmd, commandName->name, last, " ");
-    free_state(last);
+    free_variable_state(last);
     strcpy(last, commandName->name);
     return head;
 }
@@ -227,7 +227,7 @@ command* convert_to_int(command* head, char* last)
     var_node* commandName;
     commandName = add_temp_var(genChars[0].charCmd);
     head = translate_comand(head, genChars[1].charCmd, genStrings[3].stringCmd, commandName->name, last, " ");
-    free_state(last);
+    free_variable_state(last);
     strcpy(last, commandName->name);
     return head;
 }
@@ -266,7 +266,7 @@ void update_list_to_label(command_list* head, command* label)
 
 void rename_argument(command* com, char* newArg)
 {
-    free_state(com->firstArg);
+    free_variable_state(com->firstArg);
     sprintf(com->firstArg, "%s", newArg);
 }
 

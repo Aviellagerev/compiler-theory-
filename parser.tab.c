@@ -1485,7 +1485,7 @@ yyreduce:
 {
     (yyvsp[0].stmt) = translate_comand((yyvsp[0].stmt), 'H', "ALT", "", "", "");
     command_print((yyvsp[0].stmt));
-    free_tree(); /* Free symbol table */
+    free_symbol_table(); /* Free symbol table */
     free_list((yyvsp[0].stmt)); /* Free command list */
 }
 #line 1492 "parser.tab.c"
@@ -1499,7 +1499,7 @@ yyreduce:
 
   case 6: /* $@1: %empty  */
 #line 89 "parser.y"
-                             { set_varible_type((yyvsp[0].type)); }
+                             { set_variable_type((yyvsp[0].type)); }
 #line 1504 "parser.tab.c"
     break;
 
@@ -1523,13 +1523,13 @@ yyreduce:
 
   case 11: /* idlist: idlist ',' ID  */
 #line 97 "parser.y"
-                      { set_varible_name((yyvsp[0].id)); }
+                      { set_variable_name((yyvsp[0].id)); }
 #line 1528 "parser.tab.c"
     break;
 
   case 12: /* idlist: ID  */
 #line 98 "parser.y"
-     { set_varible_name((yyvsp[0].id)); }
+     { set_variable_name((yyvsp[0].id)); }
 #line 1534 "parser.tab.c"
     break;
 
@@ -1623,7 +1623,7 @@ yyreduce:
 #line 123 "parser.y"
 {
     (yyval.stmt) = NULL;
-    if (!(current_variable = search_varible((yyvsp[-2].id))))
+    if (!(current_variable = search_variable((yyvsp[-2].id))))
         report_error(error_messeges[4], (yyvsp[-2].id));
     else
         (yyval.stmt) = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
@@ -1641,7 +1641,7 @@ yyreduce:
 #line 134 "parser.y"
 {
     (yyval.stmt) = translate_comand((yyvsp[-2].expression).head, (yyvsp[-2].expression).type, "PRT", (yyvsp[-2].expression).last, "", "");
-    free_state((yyvsp[-2].expression).last); /* Mark variable as free if temporary */
+    free_variable_state((yyvsp[-2].expression).last); /* Mark variable as free if temporary */
 }
 #line 1647 "parser.tab.c"
     break;
@@ -1908,7 +1908,7 @@ yyreduce:
 #line 296 "parser.y"
 {
     (yyval.expression).head = NULL;
-    if (!(current_variable = search_varible((yyvsp[0].id)))) {
+    if (!(current_variable = search_variable((yyvsp[0].id)))) {
         report_error(error_messeges[4], (yyvsp[0].id));
         (yyval.expression).type = 0;
     } else {

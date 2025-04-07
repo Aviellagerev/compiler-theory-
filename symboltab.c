@@ -1,115 +1,170 @@
 #include "symboltab.h"
 
-var_node* symbol_table[TABLE_SIZE] = {NULL};  // Hash table
-int var_count = 1;  // Temporary variable counter
+var_node* symbol_table[TABLE_SIZE] = {NULL};  // Hash table initialization
+int var_count = 1;                            // Temporary variable counter
 
-/* Hash function to map variable names to an index */
-unsigned int hash_function(char *name) {
+/**
+ * @brief Generates hash index for a variable name
+ * @param name Variable name to hash
+ * @return Hash index between 0 and TABLE_SIZE-1
+ */
+unsigned int hash_function(const char *name) {
     unsigned int hash = 0;
-    while (*name)
+    while (*name) {
         hash = (hash * 31) + *name++;
+    }
     return hash % TABLE_SIZE;
 }
 
-/* Search for a variable by name in the hash table */
-var_node* search_varible(char* name) {
+/**
+ * @brief Searches for a variable in the symbol table
+ * @param name Variable name to search for
+ * @return Pointer to variable node if found, NULL otherwise
+ */
+var_node* search_variable(char *name) {
     unsigned int index = hash_function(name);
-    var_node *curr = symbol_table[index];
+    var_node *current = symbol_table[index];
 
-    while (curr) {
-        if (strcmp(curr->name, name) == 0)
-            return curr;  // Found variable
-        curr = curr->next;
+    while (current != NULL) {
+        if (strcmp(current->name, name) == 0) {
+            return current;
+        }
+        current = current->next;
     }
-    return NULL;  // Not found
+    return NULL;
 }
 
-/* Add a new variable to the symbol table */
-var_node* add_var_name(char* name) {
-    unsigned int index = hash_function(name);
-    var_node *new_var = (var_node*)malloc(sizeof(var_node));
-    
-    if (!new_var) {
-        printf("Memory allocation failed\n");
+/**
+ * @brief Adds a new variable to the symbol table
+ * @param name Variable name to add
+ * @return Pointer to new node if successful, NULL otherwise
+ */
+var_node* add_variable_name(char *name) {
+    // Check for existing variable
+    if (search_variable(name) != NULL) {
+        report_error(error_messeges[19], name);
         return NULL;
     }
 
-    strcpy(new_var->name, name);
-    new_var->state = LOCK;
-    new_var->flag = 0;
-    new_var->next = symbol_table[index];  // Insert at the head of the list
-    symbol_table[index] = new_var;
+    // Allocate new node
+    unsigned int index = hash_function(name);
+    var_node *new_node = (var_node*)malloc(sizeof(var_node));
     
-    return new_var;
+    if (new_node == NULL) {
+        report_error(error_messeges[0], "Memory allocation failed");
+        return NULL;
+    }
+
+    // Initialize node fields
+    strncpy(new_node->name, name, VARLEN);
+    new_node->state = LOCK;
+    new_node->flag = 0;
+    new_node->type = '\0';
+    
+    // Insert at head of chain
+    new_node->next = symbol_table[index];
+    symbol_table[index] = new_node;
+
+    return new_node;
 }
 
-/* Check if a variable exists, if not, add it */
-void set_varible_name(char *name) {
-    if (!search_varible(name))
-        add_var_name(name);
-    else
-        report_error(error_messeges[19],name);
+/**
+ * @brief Public interface to declare a new variable
+ * @param name Variable name to declare
+ */
+void set_variable_name(char *name) {
+    if (add_variable_name(name) == NULL) {
+        // Error already reported by add_variable_name
+        return;
+    }
 }
 
-/* Assign a type to all untyped variables */
-void set_varible_type(char type) {
+/**
+ * @brief Assigns type to all untyped variables
+ * @param type Data type to assign (e.g., 'i', 'f')
+ */
+void set_variable_type(char type) {
     for (int i = 0; i < TABLE_SIZE; i++) {
-        var_node *curr = symbol_table[i];
-        while (curr) {
-            if (curr->flag == 0) {
-                curr->type = type;
-                curr->flag = 1;
+        var_node *current = symbol_table[i];
+        while (current != NULL) {
+            if (current->flag == 0) {
+                current->type = type;
+                current->flag = 1;
             }
-            curr = curr->next;
+            current = current->next;
         }
     }
 }
 
-/* Search for a free temporary variable of a specific type */
+/**
+ * @brief Finds a reusable temporary variable of specified type
+ * @param type Data type to search for
+ * @return Pointer to available variable or NULL if none found
+ */
 var_node* search_free_var(char type) {
     for (int i = 0; i < TABLE_SIZE; i++) {
-        var_node *curr = symbol_table[i];
-        while (curr) {
-            if (curr->state == FREE && curr->type == type)
-                return curr;
-            curr = curr->next;
+        var_node *current = symbol_table[i];
+        while (current != NULL) {
+            if (current->state == FREE && current->type == type) {
+                return current;
+            }
+            current = current->next;
         }
     }
     return NULL;
 }
 
-/* Add a temporary variable */
+/**
+ * @brief Creates or reuses a temporary variable
+ * @param type Data type for the temporary variable
+ * @return Pointer to temporary variable node
+ */
 var_node* add_temp_var(char type) {
-    char name[VARLEN];
-    var_node *new_temp = search_free_var(type);
+    char temp_name[VARLEN];
+    var_node *temp = search_free_var(type);
     
-    if (!new_temp) {
-        sprintf(name, "var%d", var_count++);
-        new_temp = add_var_name(name);
-        new_temp->type = type;
-        new_temp->flag = 1;
+    if (temp == NULL) {
+        // Generate unique temporary name
+        do {
+            snprintf(temp_name, VARLEN, "var%d", var_count++);
+        } while (search_variable(temp_name) != NULL);
+        
+        temp = add_variable_name(temp_name);
+        if (temp == NULL) {
+            return NULL;  // Error already reported
+        }
+        
+        temp->type = type;
+        temp->flag = 1;
     }
     
-    new_temp->state = SAVE;
-    return new_temp;
+    temp->state = SAVE;
+    return temp;
 }
 
-/* Mark a variable as free */
-void free_state(char* name) {
-    var_node *curr = search_varible(name);
-    if (curr && curr->state == SAVE)
-        curr->state = FREE;
+/**
+ * @brief Releases a variable for potential reuse
+ * @param name Name of variable to mark as FREE
+ */
+void free_variable_state(char *name) {
+    var_node *target = search_variable(name);
+    if (target != NULL && target->state == SAVE) {
+        target->state = FREE;
+    }
 }
 
-/* Free the entire symbol table */
-void free_tree() {
+/**
+ * @brief Completely cleans up the symbol table
+ */
+void free_symbol_table() {
     for (int i = 0; i < TABLE_SIZE; i++) {
-        var_node *curr = symbol_table[i];
-        while (curr) {
-            var_node *temp = curr;
-            curr = curr->next;
-            free(temp);
+        var_node *current = symbol_table[i];
+        while (current != NULL) {
+            var_node *next = current->next;
+            free(current);
+            current = next;
         }
         symbol_table[i] = NULL;
     }
+    var_count = 1;  // Reset temporary counter
 }
