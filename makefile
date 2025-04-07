@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -g -Wall -Wextra
-FLEXFLAGS =  # Flex doesn't support -W flags directly
+FLEXFLAGS = 
 BISONFLAGS = -d
 LDFLAGS = 
 
@@ -11,14 +11,17 @@ TARGET = cpq
 # Source files
 BISON_SRC = parser.y
 FLEX_SRC = lexer.l
-C_SRCS = cpq.c translator.c symboltab.c
+C_SRCS = cpq.c translator.c symboltab.c error.c
 
 # Generated files
 BISON_OUT = parser.tab.c parser.tab.h
 FLEX_OUT = lex.yy.c
 
 # Object files
-OBJS = lex.yy.o parser.tab.o cpq.o translator.o symboltab.o
+OBJS = lex.yy.o parser.tab.o cpq.o translator.o symboltab.o error.o
+
+# Header dependencies (add error.h here if you create it)
+DEPS = parser.tab.h translator.h symboltab.h error.h
 
 # Default target
 all: $(TARGET)
@@ -27,16 +30,16 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# Flex rule (suppress warnings via %option in .l file)
-lex.yy.c: $(FLEX_SRC) parser.tab.h
+# Flex rule
+lex.yy.c: $(FLEX_SRC) $(DEPS)
 	flex $<
 
 # Bison rule
 parser.tab.c parser.tab.h: $(BISON_SRC)
 	bison $(BISONFLAGS) $<
 
-# Compile .c to .o (suppress unused-variable only for translator.c)
-%.o: %.c
+# General compilation rule with header dependencies
+%.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Special rule for translator.o to suppress unused-variable warning

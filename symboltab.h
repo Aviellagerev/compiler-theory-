@@ -31,4 +31,5 @@ void free_state(char* name);
 void free_tree();
 
 extern void report_error(const char *format, ...);
+extern const char* error_messeges[];
 #endif // SYMBOLTAB_H

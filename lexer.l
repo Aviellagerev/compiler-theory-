@@ -4,8 +4,10 @@
 #include "symboltab.h"
 #include "translator.h"
 #include "parser.tab.h"
-
+#include "error.h"
 int line = 1;
+extern  void report_error(const char *format, ...);
+extern const char* error_messeges[];
 %}
 
 %x COMMENT
@@ -67,8 +69,7 @@ int line = 1;
                        if (yyleng < VARLEN) {
                          strcpy(yylval.id, yytext);
                        } else {
-                         fprintf(stderr, "Error at line %d: Identifier '%.*s...' exceeds maximum length of %d characters\n",
-                                 line, VARLEN - 1, yytext, VARLEN - 1);
+                         report_error(error_messeges[20], VARLEN - 1, yytext, VARLEN - 1);
                        }
                        return ID;
                      }
@@ -82,6 +83,6 @@ int line = 1;
 [ \t]             ;
 "\n"              { ++line; }
 
-.                 { fprintf(stderr, "Error at line %d: Unknown token '%s'\n", line, yytext); }
+.                 { report_error(error_messeges[21], yytext); }
 
 %%

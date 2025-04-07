@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include "symboltab.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
@@ -13,17 +12,20 @@
 #define LABELS 100
 
 #define ERRLEN 100 /* Save place in memory for string */
-#define CHAR 1     /* Save place in memory for char */
-#define STR 4      /* Save place in memory for char */
+#define CHAR 1      /* Save place in memory for char */
+#define STR 4       /* Save place in memory for string */
+
 /*--------------------------------------------------------------
  * Forward declarations for types used in translator.c
  *--------------------------------------------------------------*/
-
-typedef char chars[CHAR];
+extern const char* error_messeges[];
 typedef char strings[STR];
+typedef char chars[CHAR];
+
 
 /* Command structure: represents a quad or assembly command.
    (Field sizes are assumed and can be adjusted.) */
+
 typedef struct command {
     char com[50];         // command name (e.g. "IADD", "JMP")
     char firstArg[50];
@@ -32,6 +34,7 @@ typedef struct command {
     struct command *next;
 } command;
 enum {equal,notEqual,bigger,smaller,biggerOrEqual,smallerOrEqual,castToInt,castToFloat};
+
 
 /* Linked list of commands */
 typedef struct command_list {

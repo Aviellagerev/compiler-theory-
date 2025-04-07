@@ -21,7 +21,7 @@ command_list *temp_link = NULL; /* Temporary link for command lists */
 char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
-
+extern const char* error_messeges[];
 
 
 %}
@@ -87,7 +87,7 @@ declarations: declarations declaration
 ;
 
 declaration: idlist ':' type { set_varible_type($3); } ';'
-| idlist ':' error { report_error("invalid type\n"); yyerrok; yyclearin; }
+| idlist ':' error { report_error(error_messeges[5]); yyerrok; yyclearin; }
 ;
 
 type: INT { $$ = $1; } /* 'I' from lexer */
@@ -96,7 +96,7 @@ type: INT { $$ = $1; } /* 'I' from lexer */
 
 idlist: idlist ',' ID { set_varible_name($3); }
 | ID { set_varible_name($1); }
-| idlist ',' error { report_error("invalid identifier in list\n"); yyerrok; yyclearin; }
+| idlist ',' error { report_error(error_messeges[6]); yyerrok; yyclearin; }
 ;
 
 stmt: assignment_stmt { $$ = $1; }
@@ -107,8 +107,8 @@ stmt: assignment_stmt { $$ = $1; }
 | switch_stmt { $$ = $1; }
 | break_stmt { $$ = $1; }
 | stmt_block { $$ = $1; }
-| ID { report_error("incomplete statement starting with ID '%s'\n", $1); $$ = NULL; }
-| NUM { report_error("unexpected number '%s'\n", $1.value); $$ = NULL; }
+| ID { report_error(error_messeges[7], $1); $$ = NULL; }
+| NUM { report_error(error_messeges[8], $1.value); $$ = NULL; }
 | error { yyerrok; yyclearin; $$ = NULL; } /* yyerror is called automatically */
 ;
 
@@ -116,18 +116,18 @@ assignment_stmt: ID '=' expression ';'
 {
     $$ = add_assign_commadn($1, $3.last, $3.type, $3.head);
 }
-| ID '=' expression { report_error("missing semicolon after assignment\n"); $$ = NULL; }
+| ID '=' expression { report_error(error_messeges[9]); $$ = NULL; }
 ;
 
 input_stmt: INPUT '(' ID ')' ';'
 {
     $$ = NULL;
     if (!(current_variable = search_varible($3)))
-        report_error("unknown variable '%s', not defined in symbol table\n", $3);
+        report_error(error_messeges[4], $3);
     else
         $$ = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
 }
-| INPUT '(' ID ')' { report_error("missing semicolon after input statement\n"); $$ = NULL; }
+| INPUT '(' ID ')' { report_error(error_messeges[10]); $$ = NULL; }
 ;
 
 output_stmt: OUTPUT '(' expression ')' ';'
@@ -135,7 +135,7 @@ output_stmt: OUTPUT '(' expression ')' ';'
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
     free_state($3.last); /* Mark variable as free if temporary */
 }
-| OUTPUT '(' expression ')' { report_error("missing semicolon after output statement\n"); $$ = NULL; }
+| OUTPUT '(' expression ')' { report_error(error_messeges[10]); $$ = NULL; }
 ;
 
 if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
@@ -149,7 +149,7 @@ if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
     $$ = add_label($$);
     update_list_to_label(temp_link, get_last_command($$));
 }
-| IF '(' error ')' stmt ELSE stmt { report_error("invalid condition in if\n"); yyerrok; yyclearin; $$ = NULL; }
+| IF '(' error ')' stmt ELSE stmt { report_error(error_messeges[12]); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 while_stmt: WHILE '(' boolexpr ')' stmt
@@ -163,7 +163,7 @@ while_stmt: WHILE '(' boolexpr ')' stmt
     $$ = add_label($$);
     update_list_to_label($3.false, get_last_command($$));
 }
-| WHILE '(' error ')' stmt { report_error("invalid condition in while\n"); yyerrok; yyclearin; $$ = NULL; }
+| WHILE '(' error ')' stmt { report_error(error_messeges[13]); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
@@ -181,7 +181,7 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 }
 | SWITCH '(' expression ')' '{' caselist '}'
 {
-    report_error("missing DEFAULT in switch statement\n");
+    report_error(error_messeges[14]);
     $$ = NULL;
 }
 ;
@@ -203,16 +203,16 @@ caselist: caselist CASE NUM ':' stmtlist
 ;
 
 break_stmt: BREAK ';' { $$ = NULL; }
-| BREAK { report_error("missing semicolon after break\n"); $$ = NULL; }
+| BREAK { report_error(error_messeges[15]); $$ = NULL; }
 ;
 
 stmt_block: '{' stmtlist '}' { $$ = $2; }
-| '{' error '}' { report_error("invalid statement block\n"); yyerrok; yyclearin; $$ = NULL; }
+| '{' error '}' { report_error(error_messeges[16]); yyerrok; yyclearin; $$ = NULL; }
 ;
 
 stmtlist: stmtlist stmt { $$ = merege_comand($1, $2); }
+| stmtlist error { report_error(error_messeges[16]); yyerrok; yyclearin; $$ = $1; }
 | /* empty */ { $$ = NULL; }
-| stmtlist error { report_error("error in statement list\n"); yyerrok; yyclearin; $$ = $1; }
 ;
 
 boolexpr: boolexpr OR boolterm
@@ -294,7 +294,7 @@ factor: '(' expression ')'
 {
     $$.head = NULL;
     if (!(current_variable = search_varible($1))) {
-        report_error("unknown variable '%s', not defined in symbol table\n", $1);
+        report_error(error_messeges[4], $1);
         $$.type = 0;
     } else {
         strcpy($$.last, $1);

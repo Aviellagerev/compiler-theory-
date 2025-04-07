@@ -91,7 +91,7 @@ command_list *temp_link = NULL; /* Temporary link for command lists */
 char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values */
 char case_val[10]; /* Array to store case values */
-
+extern const char* error_messeges[];
 
 
 
@@ -609,7 +609,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-45)
+#define YYTABLE_NINF (-46)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -648,7 +648,7 @@ static const yytype_int8 yydefact[] =
        0,     0,     0,     0,    56,    52,    54,    29,    27,    24,
        0,     0,    46,     0,    48,    51,    38,    34,    33,    57,
        0,    50,     0,     0,    32,    31,     0,     0,    36,     0,
-      44,    44,     0,     0,    35
+      45,    45,     0,     0,    35
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -675,10 +675,10 @@ static const yytype_int8 yytable[] =
       52,    55,    65,     1,    63,    -5,    15,     5,    16,   -37,
       69,    68,    17,    18,    19,   106,    20,    21,   -37,    22,
       76,    69,    23,    72,   107,    40,    12,    83,    13,    77,
-      70,    -5,    91,     6,     6,   -37,    10,    69,   -44,    95,
-      69,   108,   -44,   -44,   -44,     4,   -44,   -44,    69,   -44,
-      80,    90,   -44,    84,    93,    38,    14,    39,    97,    98,
-      15,    99,    16,    76,   -44,   -44,    17,    18,    19,    76,
+      70,    -5,    91,     6,     6,   -37,    10,    69,   -45,    95,
+      69,   108,   -45,   -45,   -45,     4,   -45,   -45,    69,   -45,
+      80,    90,   -45,    84,    93,    38,    14,    39,    97,    98,
+      15,    99,    16,    76,   -45,   -45,    17,    18,    19,    76,
       20,    21,    82,    22,    41,    69,    23,   104,   101,   105,
      112,   113,    79,    42,    15,    57,    16,    48,     6,    24,
       17,    18,    19,    43,    20,    21,    44,    22,    45,    34,
@@ -746,7 +746,7 @@ static const yytype_int8 yyr2[] =
        1,     3,     1,     3,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     4,     3,     5,     4,     5,
        4,     7,     7,     5,     5,    10,     7,     5,     0,     2,
-       1,     3,     3,     2,     0,     2,     3,     1,     3,     1,
+       1,     3,     3,     2,     2,     0,     3,     1,     3,     1,
        4,     3,     3,     1,     3,     1,     3,     4,     1,     1
 };
 
@@ -1505,7 +1505,7 @@ yyreduce:
 
   case 8: /* declaration: idlist ':' error  */
 #line 90 "parser.y"
-                   { report_error("invalid type\n"); yyerrok; yyclearin; }
+                   { report_error(error_messeges[5]); yyerrok; yyclearin; }
 #line 1510 "parser.tab.c"
     break;
 
@@ -1535,7 +1535,7 @@ yyreduce:
 
   case 13: /* idlist: idlist ',' error  */
 #line 99 "parser.y"
-                   { report_error("invalid identifier in list\n"); yyerrok; yyclearin; }
+                   { report_error(error_messeges[6]); yyerrok; yyclearin; }
 #line 1540 "parser.tab.c"
     break;
 
@@ -1589,13 +1589,13 @@ yyreduce:
 
   case 22: /* stmt: ID  */
 #line 110 "parser.y"
-     { report_error("incomplete statement starting with ID '%s'\n", (yyvsp[0].id)); (yyval.stmt) = NULL; }
+     { report_error(error_messeges[7], (yyvsp[0].id)); (yyval.stmt) = NULL; }
 #line 1594 "parser.tab.c"
     break;
 
   case 23: /* stmt: NUM  */
 #line 111 "parser.y"
-      { report_error("unexpected number '%s'\n", (yyvsp[0].num).value); (yyval.stmt) = NULL; }
+      { report_error(error_messeges[8], (yyvsp[0].num).value); (yyval.stmt) = NULL; }
 #line 1600 "parser.tab.c"
     break;
 
@@ -1615,7 +1615,7 @@ yyreduce:
 
   case 26: /* assignment_stmt: ID '=' expression  */
 #line 119 "parser.y"
-                    { report_error("missing semicolon after assignment\n"); (yyval.stmt) = NULL; }
+                    { report_error(error_messeges[9]); (yyval.stmt) = NULL; }
 #line 1620 "parser.tab.c"
     break;
 
@@ -1624,7 +1624,7 @@ yyreduce:
 {
     (yyval.stmt) = NULL;
     if (!(current_variable = search_varible((yyvsp[-2].id))))
-        report_error("unknown variable '%s', not defined in symbol table\n", (yyvsp[-2].id));
+        report_error(error_messeges[4], (yyvsp[-2].id));
     else
         (yyval.stmt) = translate_comand(NULL, current_variable->type, "INP", current_variable->name, "", "");
 }
@@ -1633,7 +1633,7 @@ yyreduce:
 
   case 28: /* input_stmt: INPUT '(' ID ')'  */
 #line 130 "parser.y"
-                   { report_error("missing semicolon after input statement\n"); (yyval.stmt) = NULL; }
+                   { report_error(error_messeges[10]); (yyval.stmt) = NULL; }
 #line 1638 "parser.tab.c"
     break;
 
@@ -1648,7 +1648,7 @@ yyreduce:
 
   case 30: /* output_stmt: OUTPUT '(' expression ')'  */
 #line 138 "parser.y"
-                            { report_error("missing semicolon after output statement\n"); (yyval.stmt) = NULL; }
+                            { report_error(error_messeges[10]); (yyval.stmt) = NULL; }
 #line 1653 "parser.tab.c"
     break;
 
@@ -1669,7 +1669,7 @@ yyreduce:
 
   case 32: /* if_stmt: IF '(' error ')' stmt ELSE stmt  */
 #line 152 "parser.y"
-                                  { report_error("invalid condition in if\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
+                                  { report_error(error_messeges[12]); yyerrok; yyclearin; (yyval.stmt) = NULL; }
 #line 1674 "parser.tab.c"
     break;
 
@@ -1690,7 +1690,7 @@ yyreduce:
 
   case 34: /* while_stmt: WHILE '(' error ')' stmt  */
 #line 166 "parser.y"
-                           { report_error("invalid condition in while\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
+                           { report_error(error_messeges[13]); yyerrok; yyclearin; (yyval.stmt) = NULL; }
 #line 1695 "parser.tab.c"
     break;
 
@@ -1714,7 +1714,7 @@ yyreduce:
   case 36: /* switch_stmt: SWITCH '(' expression ')' '{' caselist '}'  */
 #line 183 "parser.y"
 {
-    report_error("missing DEFAULT in switch statement\n");
+    report_error(error_messeges[14]);
     (yyval.stmt) = NULL;
 }
 #line 1721 "parser.tab.c"
@@ -1751,7 +1751,7 @@ yyreduce:
 
   case 40: /* break_stmt: BREAK  */
 #line 206 "parser.y"
-        { report_error("missing semicolon after break\n"); (yyval.stmt) = NULL; }
+        { report_error(error_messeges[15]); (yyval.stmt) = NULL; }
 #line 1756 "parser.tab.c"
     break;
 
@@ -1763,7 +1763,7 @@ yyreduce:
 
   case 42: /* stmt_block: '{' error '}'  */
 #line 210 "parser.y"
-                { report_error("invalid statement block\n"); yyerrok; yyclearin; (yyval.stmt) = NULL; }
+                { report_error(error_messeges[16]); yyerrok; yyclearin; (yyval.stmt) = NULL; }
 #line 1768 "parser.tab.c"
     break;
 
@@ -1773,15 +1773,15 @@ yyreduce:
 #line 1774 "parser.tab.c"
     break;
 
-  case 44: /* stmtlist: %empty  */
+  case 44: /* stmtlist: stmtlist error  */
 #line 214 "parser.y"
-              { (yyval.stmt) = NULL; }
+                 { report_error(error_messeges[16]); yyerrok; yyclearin; (yyval.stmt) = (yyvsp[-1].stmt); }
 #line 1780 "parser.tab.c"
     break;
 
-  case 45: /* stmtlist: stmtlist error  */
+  case 45: /* stmtlist: %empty  */
 #line 215 "parser.y"
-                 { report_error("error in statement list\n"); yyerrok; yyclearin; (yyval.stmt) = (yyvsp[-1].stmt); }
+              { (yyval.stmt) = NULL; }
 #line 1786 "parser.tab.c"
     break;
 
@@ -1907,7 +1907,7 @@ yyreduce:
 {
     (yyval.expression).head = NULL;
     if (!(current_variable = search_varible((yyvsp[0].id)))) {
-        report_error("unknown variable '%s', not defined in symbol table\n", (yyvsp[0].id));
+        report_error(error_messeges[4], (yyvsp[0].id));
         (yyval.expression).type = 0;
     } else {
         strcpy((yyval.expression).last, (yyvsp[0].id));

@@ -48,7 +48,7 @@ void set_varible_name(char *name) {
     if (!search_varible(name))
         add_var_name(name);
     else
-        report_error("ERROR: Variable name exists in symbol table\n");
+        report_error(error_messeges[19],name);
 }
 
 /* Assign a type to all untyped variables */

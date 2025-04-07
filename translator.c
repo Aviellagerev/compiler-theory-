@@ -107,9 +107,9 @@ command* add_assign_commadn(char* var, char* exp, char expType, command* expHead
     free_state(exp);
 
     if (!(symbol = search_varible(var)))
-        report_error("ERROR: unknown variable, not defined in the symbol table\n");
+        report_error(error_messeges[4],var);
     else if (symbol->type == genChars[0].charCmd && expType == genChars[1].charCmd)
-        report_error("cast from float to int ERROR!  \n");
+        report_error(error_messeges[18]);
     else
     {
         if (symbol->type == genChars[1].charCmd && expType == genChars[0].charCmd)
