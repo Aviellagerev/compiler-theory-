@@ -11,9 +11,15 @@
 #define ARGLEN 100
 #define LABELS 100
 
+#define ERRLEN 100 /* Save place in memory for string */
+#define CHAR 1     /* Save place in memory for char */
+#define STR 4      /* Save place in memory for char */
 /*--------------------------------------------------------------
  * Forward declarations for types used in translator.c
  *--------------------------------------------------------------*/
+
+typedef char chars[CHAR];
+typedef char strings[STR];
 
 /* Command structure: represents a quad or assembly command.
    (Field sizes are assumed and can be adjusted.) */
@@ -31,6 +37,17 @@ typedef struct command_list {
     command *com;
     struct command_list *next;
 } command_list;
+
+typedef struct {
+    char charCmd;
+    chars* charAddress;
+} charCmd;
+
+typedef struct {
+    char* stringCmd;
+    strings* strAddress;
+} strCmd;
+
 
 
 /*--------------------------------------------------------------
@@ -93,5 +110,7 @@ void command_print(command* head);
 
 /* Frees the entire command linked list */
 void free_list(command* head);
+
+
 
 #endif /* TRANSLATOR_H */

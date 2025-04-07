@@ -1,24 +1,10 @@
 #include "translator.h"
 
-#define ERRLEN 100 /* Save place in memory for string */
-#define CHAR 1     /* Save place in memory for char */
-#define STR 4      /* Save place in memory for char */
 
-typedef char chars[CHAR];
-typedef char strings[STR];
+
 
 chars CHAR0, CHAR1, CHAR2, CHAR3, CHAR4, CHAR5;
 strings STR0, STR1, STR2, STR3, STR4, STR5, STR6, STR7, STR8, STR9, STR10, STR11, STR12, STR13;
-
-typedef struct {
-    char charCmd;
-    chars* charAddress;
-} charCmd;
-
-typedef struct {
-    char* stringCmd;
-    strings* strAddress;
-} strCmd;
 
 charCmd genChars[] = {
     {'I', &CHAR0}, /* int */
@@ -248,9 +234,7 @@ command* convert_to_int(command* head, char* last)
 
 char type_decider(char type1, char type2)
 {
-    if (type1 == genChars[1].charCmd || type2 == genChars[1].charCmd)
-        return genChars[1].charCmd;
-    return genChars[0].charCmd;
+    return (type1 == 'R' || type2 == 'R') ? 'R' : 'I';
 }
 
 int cast(int castOp)

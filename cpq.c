@@ -18,7 +18,7 @@ FILE* openFile(char* name, char* type) {
 int main(int argc, char* argv[]) {
     char* name;
     char* ext = NULL; 
-
+    
     if (argc != 2) {
         cpqReportError(cpqMessages[1]);
         return 0;

@@ -1,0 +1,15 @@
+IINP	cond		
+IEQL	var1	cond	1
+JMPZ	6	var1	
+IPRT	1		
+JUMP	15		
+IEQL	var2	cond	2
+JMPZ	10	var2	
+IPRT	2		
+JUMP	15		
+IEQL	var3	cond	3
+JMPZ	14	var3	
+IPRT	3		
+JUMP	15		
+IPRT	0		
+HALT			
