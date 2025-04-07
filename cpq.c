@@ -3,7 +3,6 @@
 
 /*error messeges*/
 
-
 /* Open file function */
 FILE* openFile(char* name, char* type) {
     FILE* file = fopen(name, type);
