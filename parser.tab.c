@@ -569,8 +569,8 @@ static const yytype_int16 yyrline[] =
       94,    97,    98,    99,   102,   103,   104,   105,   106,   107,
      108,   109,   110,   111,   112,   115,   119,   122,   130,   133,
      138,   141,   152,   155,   166,   169,   182,   189,   202,   205,
-     206,   209,   210,   213,   214,   215,   218,   227,   230,   235,
-     238,   245,   256,   261,   264,   269,   272,   278,   293,   304
+     206,   209,   210,   213,   214,   215,   218,   229,   232,   237,
+     240,   247,   258,   263,   266,   271,   274,   280,   295,   306
 };
 #endif
 
@@ -1793,45 +1793,47 @@ yyreduce:
     (yyval.boolean).head = add_label((yyval.boolean).head);
     update_list_to_label((yyvsp[-2].boolean).false, get_last_command((yyval.boolean).head));
     (yyval.boolean).head = merege_comand((yyval.boolean).head, (yyvsp[0].boolean).head);
+    add_label((yyval.boolean).head);
+    update_list_to_label(temp_link, get_last_command((yyval.boolean).head));
     (yyval.boolean).false = (yyvsp[0].boolean).false;
 }
-#line 1799 "parser.tab.c"
+#line 1801 "parser.tab.c"
     break;
 
   case 47: /* boolexpr: boolterm  */
-#line 227 "parser.y"
+#line 229 "parser.y"
            { (yyval.boolean).head = (yyvsp[0].boolean).head; (yyval.boolean).false = (yyvsp[0].boolean).false; }
-#line 1805 "parser.tab.c"
+#line 1807 "parser.tab.c"
     break;
 
   case 48: /* boolterm: boolterm AND boolfactor  */
-#line 231 "parser.y"
+#line 233 "parser.y"
 {
     (yyval.boolean).head = merege_comand((yyvsp[-2].boolean).head, (yyvsp[0].boolean).head);
     (yyval.boolean).false = merge_comnd_list((yyvsp[-2].boolean).false, (yyvsp[0].boolean).false);
 }
-#line 1814 "parser.tab.c"
+#line 1816 "parser.tab.c"
     break;
 
   case 49: /* boolterm: boolfactor  */
-#line 235 "parser.y"
+#line 237 "parser.y"
              { (yyval.boolean).false = (yyvsp[0].boolean).false; (yyval.boolean).head = (yyvsp[0].boolean).head; }
-#line 1820 "parser.tab.c"
+#line 1822 "parser.tab.c"
     break;
 
   case 50: /* boolfactor: NOT '(' boolexpr ')'  */
-#line 239 "parser.y"
+#line 241 "parser.y"
 {
     (yyval.boolean).head = translate_comand((yyvsp[-1].boolean).head, 'J', "UMP", "", "", "");
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
     (yyval.boolean).head = add_label((yyval.boolean).head);
     update_list_to_label((yyvsp[-1].boolean).false, get_last_command((yyval.boolean).head));
 }
-#line 1831 "parser.tab.c"
+#line 1833 "parser.tab.c"
     break;
 
   case 51: /* boolfactor: expression RELOP expression  */
-#line 246 "parser.y"
+#line 248 "parser.y"
 {
     if ((yyvsp[-2].expression).type == 'I' && (yyvsp[0].expression).type == 'R')
         (yyvsp[-2].expression).head = convert_to_float((yyvsp[-2].expression).head, (yyvsp[-2].expression).last);
@@ -1840,51 +1842,51 @@ yyreduce:
     (yyval.boolean).head = build_relop_command((yyvsp[-1].relop), (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).head, (yyvsp[0].expression).head, type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type));
     (yyval.boolean).false = add_new_command_list(NULL, get_last_command((yyval.boolean).head));
 }
-#line 1844 "parser.tab.c"
+#line 1846 "parser.tab.c"
     break;
 
   case 52: /* expression: expression ADDOP term  */
-#line 257 "parser.y"
+#line 259 "parser.y"
 {
     (yyval.expression).type = type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1853 "parser.tab.c"
+#line 1855 "parser.tab.c"
     break;
 
   case 53: /* expression: term  */
-#line 261 "parser.y"
+#line 263 "parser.y"
        { (yyval.expression).type = (yyvsp[0].expression).type; (yyval.expression).head = (yyvsp[0].expression).head; strcpy((yyval.expression).last, (yyvsp[0].expression).last); }
-#line 1859 "parser.tab.c"
+#line 1861 "parser.tab.c"
     break;
 
   case 54: /* term: term MULOP factor  */
-#line 265 "parser.y"
+#line 267 "parser.y"
 {
     (yyval.expression).type = type_decider((yyvsp[-2].expression).type, (yyvsp[0].expression).type);
     (yyval.expression).head = build_arithmetic_command((yyvsp[-1].op), (yyval.expression).type, (yyval.expression).last, (yyvsp[-2].expression).last, (yyvsp[0].expression).last, (yyvsp[-2].expression).type, (yyvsp[0].expression).type, (yyvsp[-2].expression).head, (yyvsp[0].expression).head);
 }
-#line 1868 "parser.tab.c"
+#line 1870 "parser.tab.c"
     break;
 
   case 55: /* term: factor  */
-#line 269 "parser.y"
+#line 271 "parser.y"
          { (yyval.expression).type = (yyvsp[0].expression).type; (yyval.expression).head = (yyvsp[0].expression).head; strcpy((yyval.expression).last, (yyvsp[0].expression).last); }
-#line 1874 "parser.tab.c"
+#line 1876 "parser.tab.c"
     break;
 
   case 56: /* factor: '(' expression ')'  */
-#line 273 "parser.y"
+#line 275 "parser.y"
 {
     (yyval.expression).type = (yyvsp[-1].expression).type;
     (yyval.expression).head = (yyvsp[-1].expression).head;
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1884 "parser.tab.c"
+#line 1886 "parser.tab.c"
     break;
 
   case 57: /* factor: CAST '(' expression ')'  */
-#line 279 "parser.y"
+#line 281 "parser.y"
 {
     number = cast((yyvsp[-3].cast_op)); /* cast() returns 1 for int, 2 for float */
     if (number == 1 && (yyvsp[-1].expression).type == 'R') {
@@ -1899,11 +1901,11 @@ yyreduce:
     }
     strcpy((yyval.expression).last, (yyvsp[-1].expression).last);
 }
-#line 1903 "parser.tab.c"
+#line 1905 "parser.tab.c"
     break;
 
   case 58: /* factor: ID  */
-#line 294 "parser.y"
+#line 296 "parser.y"
 {
     (yyval.expression).head = NULL;
     if (!(current_variable = search_varible((yyvsp[0].id)))) {
@@ -1914,21 +1916,21 @@ yyreduce:
         (yyval.expression).type = current_variable->type;
     }
 }
-#line 1918 "parser.tab.c"
+#line 1920 "parser.tab.c"
     break;
 
   case 59: /* factor: NUM  */
-#line 305 "parser.y"
+#line 307 "parser.y"
 {
     strcpy((yyval.expression).last, (yyvsp[0].num).value);
     (yyval.expression).type = (yyvsp[0].num).type;
     (yyval.expression).head = NULL;
 }
-#line 1928 "parser.tab.c"
+#line 1930 "parser.tab.c"
     break;
 
 
-#line 1932 "parser.tab.c"
+#line 1934 "parser.tab.c"
 
       default: break;
     }
@@ -2152,7 +2154,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 312 "parser.y"
+#line 314 "parser.y"
 
 
 int yyerror(const char *err)

@@ -2,16 +2,13 @@
 
 
 /*error messeges*/
-static void cpqReportError(const char *msg) {
-    fprintf(stderr, "%s", msg);
-}
 
 
 /* Open file function */
 FILE* openFile(char* name, char* type) {
     FILE* file = fopen(name, type);
     if (file == NULL) {
-        cpqReportError(cpqMessages[0]);
+     report_error(error_messeges[0]);
     }
     return file;
 }
@@ -21,7 +18,7 @@ int main(int argc, char* argv[]) {
     char* ext = NULL; 
     
     if (argc != 2) {
-        cpqReportError(cpqMessages[1]);
+        report_error(error_messeges[1]);
         return 0;
     }
     name = argv[1];
@@ -41,7 +38,7 @@ int main(int argc, char* argv[]) {
             fclose(quad);
             remove(name);
             fclose(yyin);
-            cpqReportError(cpqMessages[2]);
+            report_error(error_messeges[2]);
             
         }
         else{
@@ -52,6 +49,6 @@ int main(int argc, char* argv[]) {
 
         return 1;
     }
-    cpqReportError(cpqMessages[3]);
+    report_error(error_messeges[3]);
     return 0;
 }

@@ -5,16 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h> /* Added for variable argument handling */
-static const char* cpqMessages[] = {
-    "Error: Could not open file\n",      /* messages[0] */
-    "Usage: <program> <filename>\n",       /* messages[1] */
-    "Parse error encountered\n",         /* messages[2] */
-    "Invalid file extension\n"             /* messages[3] */
-};
-
+#include "error.h"
 /* Expected length of the file extension (".ou" is 3 characters) */
 #define LENEXT 3
-
+extern void report_error(const char *format, ...);
+extern const char* error_messeges[];
 /* Extern declarations for file pointers used by cpq.c */
 extern FILE* yyin;   /* Input file pointer (from the lexer/parser) */
  FILE* quad;   /* Output file pointer for quad commands */

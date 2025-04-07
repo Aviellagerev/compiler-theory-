@@ -1,0 +1,35 @@
+IGRT	var1	10	2
+JMPZ	4	var1	 
+JUMP	6		
+IGRT	var1	10	100
+JMPZ	8	var1	 
+IPRT	7		
+JUMP	9		
+IPRT	8		
+ILSS	var1	4	2
+JMPZ	12	var1	 
+JUMP	15		
+ILSS	var1	13	12
+ISUB	var1	1	var1
+JMPZ	17	var1	 
+IPRT	7		
+JUMP	18		
+IPRT	8		
+IGRT	var1	9	0
+JMPZ	23	var1	 
+ILSS	var1	4	2
+JMPZ	23	var1	 
+JUMP	26		
+ILSS	var1	12	20
+ISUB	var1	1	var1
+JMPZ	28	var1	 
+IPRT	7		
+JUMP	29		
+IPRT	8		
+IGRT	var1	12	9
+JMPZ	32	var1	 
+JUMP	34		
+IPRT	7		
+JUMP	35		
+IPRT	8		
+HALT			

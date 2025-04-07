@@ -1,10 +1,22 @@
-   /* should print 3  8   16.0   17.0  18.0 (or 19.0 if RTOI rounds up) */    
- a : float;
- i : int;
+{   /* should print 7788 */
 
-{
-	a=3.2;
-b = a;
-	i = a;
-	output(i);
+   if (10 > 2 || 10 > 100)
+       output(7);
+   else
+       output(8);
+
+   if (4 < 2 || 13 >= 12)
+       output(7);
+   else
+       output(8);
+
+  if (9 > 0 && 4 < 2 || 12 >= 20)
+         output(7);
+  else
+         output(8);
+
+  if (! (12 > 9))
+         output(7);
+  else
+         output(8);
 }

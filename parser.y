@@ -222,6 +222,8 @@ boolexpr: boolexpr OR boolterm
     $$.head = add_label($$.head);
     update_list_to_label($1.false, get_last_command($$.head));
     $$.head = merege_comand($$.head, $3.head);
+    add_label($$.head);
+    update_list_to_label(temp_link, get_last_command($$.head));
     $$.false = $3.false;
 }
 | boolterm { $$.head = $1.head; $$.false = $1.false; }
