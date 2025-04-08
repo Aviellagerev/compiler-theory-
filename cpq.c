@@ -1,5 +1,5 @@
 #include "cpq.h"
-
+extern int yydebug;
 /* Global Output File Pointer */
 FILE* quad = NULL; /* Output file pointer for quad commands, initialized to NULL */
 
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
     quad = output_file; /* Assign to global output file pointer */
 
     /* Parse the input file and check for errors */
+   // yydebug = 1;
     if (yyparse() != 0 || error_number > 0) {
         fclose(quad);
         remove(input_filename); /* Remove incomplete output file */

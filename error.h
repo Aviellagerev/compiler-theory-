@@ -12,7 +12,7 @@ void report_error(const char *format, ...);
 static const char* error_messeges[] = {
     "Error: Could not open file\n",                                   /* error_messeges[0] */
     "Usage: <program> <filename>\n",                                  /* error_messeges[1] */
-    "Parse error encountered\n",                                      /* error_messeges[2] */
+    "Parse error encountered Deleting qud file \n",                                      /* error_messeges[2] */
     "Invalid file extension\n"   ,                                    /* error_messeges[3] */
     "unknown variable '%s', not defined in symbol table\n",           /* error_messeges[4] */
     "invalid type\n",                                                 /*error_messeges[5] */ 
@@ -32,7 +32,8 @@ static const char* error_messeges[] = {
     "the varible %s exsists in table \n",                             /*error_nesseges[19]*/                        
     "Identifier '%.*s...' exceeds maximum length of %d characters\n", /*error_messeges[20] */
     "Unknown token '%s'\n",                                            /*error_messeges[21] */ 
-    "Error: Memory allocation failed for new command",
+    "Error: Memory allocation failed for new command\n",
+    "Missing ELSE clause in if statement\n"                                              /*error_messeges[23] */
     
 };
 #endif

@@ -39,7 +39,7 @@
 # define YY_YY_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -73,7 +73,8 @@ extern int yydebug;
     OR = 274,                      /* OR  */
     AND = 275,                     /* AND  */
     NOT = 276,                     /* NOT  */
-    RELOP = 277                    /* RELOP  */
+    RELOP = 277,                   /* RELOP  */
+    IFX = 278                      /* IFX  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -82,7 +83,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 35 "parser.y"
+#line 39 "parser.y"
 
     struct number {
         char value[VARLEN]; /* String representation of a numeric value */
@@ -108,7 +109,7 @@ union YYSTYPE
     command *stmt; /* Command representing a statement */
     int relop; /* Relational operator code (e.g., <, >, ==) */
 
-#line 112 "parser.tab.h"
+#line 113 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

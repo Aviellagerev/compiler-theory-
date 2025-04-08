@@ -1,0 +1,23 @@
+x,y : int;
+{
+	input(x);
+
+    y = x ;
+	switch(x){
+		case 1:
+			output(1);
+			break;
+		case 2:
+			output(2);
+			break;		
+        case 3:
+        x=x*10;
+        output(x);
+        break;
+        default:
+        output(0);
+        break;
+
+	
+	}
+}

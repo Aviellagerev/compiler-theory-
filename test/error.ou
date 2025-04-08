@@ -1,0 +1,21 @@
+/* showing diffrent errors */
+
+    a, x, delta : float ;
+    b : int ;
+
+{
+      if(a==1){
+     output(1);
+         }
+    x=5.6;
+    b = x; /* casting error */
+    a = 4 /*no ; */
+    switch(a){
+    case 1:{
+        output(1);
+    }
+    }
+    /*no default case*/
+  
+
+}

@@ -1,0 +1,26 @@
+IASN	b	0	 
+IEQL	var1	b	0
+JMPZ	13	var1	 
+IINP	a		
+IGRT	var1	a	0
+JMPZ	12	var1	 
+IGRT	var1	a	1000
+ISUB	var1	1	var1
+JMPZ	12	var1	 
+IASN	b	1	 
+JUMP	12		
+JUMP	2		
+IASN	ten	1	 
+IASN	b	0	 
+IGRT	var1	a	0
+JMPZ	25	var1	 
+IDIV	var1	a	2
+IMLT	var1	var1	2
+ISUB	temp	a	var1
+IMLT	var1	temp	ten
+IADD	b	b	var1
+IMLT	ten	ten	10
+IDIV	a	a	2
+JUMP	15		
+IPRT	b		
+HALT			

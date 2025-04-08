@@ -1,8 +1,8 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -g -Wall -Wextra
+CFLAGS = -g -Wall -Wextra -DYYDEBUG=1
 FLEXFLAGS = 
-BISONFLAGS = -d
+BISONFLAGS = -d --debug
 LDFLAGS = 
 
 # Targets

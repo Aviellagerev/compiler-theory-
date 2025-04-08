@@ -1,0 +1,5 @@
+ERROR: line 9: Missing ELSE clause in if statement
+ERROR: line 10: cast from float to int ERROR!
+ERROR: line 12: missing semicolon after assignment
+ERROR: line 16: missing DEFAULT in switch statement
+ERROR: Parse error encountered Deleting qud file 

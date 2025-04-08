@@ -1,0 +1,8 @@
+RINP	a		
+RINP	b		
+RLSS	var1	a	b
+JMPZ	7	var1	 
+RPRT	a		
+JUMP	8		
+RPRT	b		
+HALT			

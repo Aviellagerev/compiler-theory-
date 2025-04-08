@@ -17,7 +17,7 @@ void report_error(const char *format, ...) {
         vfprintf(stderr, format, args);
     } else {
         /* Default case: Print with line number for all other errors */
-        fprintf(stderr, "ERROR: line %d: ", line - 1);
+        fprintf(stderr, "ERROR: line %d: ", line-1 );
         vfprintf(stderr, format, args);
     }
 

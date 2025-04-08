@@ -25,8 +25,12 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values (not used in this snippet) */
 char case_val[10]; /* Array to store case values (not used in this snippet) */
 extern const char* error_messeges[]; /* Array of error messages defined elsewhere */
+ #define YYDEBUG 1
+
+ 
 %}
 
+%debug 
 /* Parser Configuration */
 %define parse.error verbose /* Enable detailed error messages for better debugging */
 
@@ -75,6 +79,9 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
 %token OR AND NOT               /* Logical operators */
 %token <relop> RELOP            /* Relational operators: <, >, ==, etc. */
 
+
+%nonassoc IFX  /* Lower precedence for IF without ELSE */
+%nonassoc ELSE /* Higher precedence for IF with ELSE */
 %%
 
 /* Grammar Rules and Actions */
@@ -162,19 +169,29 @@ output_stmt: OUTPUT '(' expression ')' ';'
 
 /* If_stmt: Implements If-Else Logic with Jumps and Labels
    - Manages control flow for conditional execution. */
-if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
+   if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
+         {
+             /* This is the CORRECT rule for if-else */
+             $$ = merege_comand($3.head, $5); /* Merge condition and then-branch */
+             $$ = translate_comand($$, 'J', "UMP", "", "", ""); /* Jump to end after then */
+             temp_link = add_new_command_list(NULL, get_last_command($$)); /* Link to end */
+             $$ = add_label($$); /* Label after then (start of else) */
+             update_list_to_label($3.false, get_last_command($$)); /* False jumps to else */
+             $$ = merege_comand($$, $7); /* Merge else-branch */
+             $$ = add_label($$); /* Label at end */
+             update_list_to_label(temp_link, get_last_command($$)); /* Jump from end of 'then' to end */
+         }
+      | IF '(' boolexpr ')' stmt %prec IFX
 {
-    $$ = merege_comand($3.head, $5); /* Merge condition and then-branch */
-    $$ = translate_comand($$, 'J', "UMP", "", "", ""); /* Jump to end after then */
-    temp_link = add_new_command_list(NULL, get_last_command($$)); /* Link to end */
-    $$ = add_label($$); /* Label after then */
-    update_list_to_label($3.false, get_last_command($$)); /* False jumps to else */
-    $$ = merege_comand($$, $7); /* Merge else-branch */
-    $$ = add_label($$); /* Label at end */
-    update_list_to_label(temp_link, get_last_command($$)); /* Jump to end */
+    report_error(error_messeges[23]);
+    $$ = NULL;
 }
 | IF '(' error ')' stmt ELSE stmt { report_error(error_messeges[12]); yyerrok; yyclearin; $$ = NULL; }
 ;
+
+
+      
+
 
 /* While_stmt: Implements a While Loop with Jumps and Labels
    - Loops back to the condition if true, exits if false. */
@@ -364,6 +381,12 @@ factor: '(' expression ')'
 /* Error Handling Function: Reports Parsing Errors with Line Number */
 int yyerror(const char *err)
 {
+    /*in case of critical error this can cause an infinite loop*/
+     if (strstr(err, "syntax error") != NULL || strstr(err, "end of file") != NULL) {
+         // Adding an extra message to stderr makes it clear why it's stopping
+         fprintf(stderr, "FATAL: Unrecoverable parsing error near line %d. Halting.\n", line);
+         exit(1); // Terminate the parser process immediately
+    }
     report_error("%s\n", err);
     return 1;
 }

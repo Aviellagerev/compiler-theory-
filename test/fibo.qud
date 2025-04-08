@@ -1,0 +1,11 @@
+IASN	a	0	 
+IASN	b	1	 
+IGRT	var1	a	1000
+ISUB	var1	1	var1
+JMPZ	11	var1	 
+IPRT	a		
+IADD	c	a	b
+IASN	a	b	 
+IASN	b	c	 
+JUMP	3		
+HALT			
