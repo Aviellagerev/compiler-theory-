@@ -15,7 +15,11 @@ int yyerror(const char *s); /* Error handling function defined below */
 extern int line; /* Tracks current line number, defined in lexer */
 
 /* Global Variables Used Throughout the Parser */
+/*im sure this can be removed or changed to make this better*/
 command_list *case_jumps = NULL; /* List of jumps for case statements in switch */
+/*future me: cant figure it out i lied */
+/*double future me  i lied twice cant be done */
+
 int number = 0; /* Counter for cast operations (1 for int, 2 for float) */
 int error_number = 0; /* Counter for errors (not used in this snippet) */
 var_node *current_variable = NULL, *next_variable = NULL; /* Pointers to variables in the symbol table */
@@ -25,7 +29,7 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values (not used in this snippet) */
 char case_val[10]; /* Array to store case values (not used in this snippet) */
 extern const char* error_messeges[]; /* Array of error messages defined elsewhere */
- #define YYDEBUG 1
+ #define YYDEBUG 1/* for debug*/
 
  
 %}
@@ -37,36 +41,35 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
 /* Union Definition: Specifies Types for Semantic Values */
 %union
 {
-    struct number {
-        char value[VARLEN]; /* String representation of a numeric value */
-        char type; /* 'I' for int, 'R' for float */
-    } num;
+        char id[VARLEN]; /* Identifier name */
+    char type; /* Type of a variable or expression ('I' or 'R') */
+    char op; /* Arithmetic operator (+, -, *, /) */
+    char cast_op; /* Cast operator (e.g., to int or float) */
+    command *stmt; /* Command representing a statement */
+    int relop; /* Relational operator code (e.g., <, >, ==) */
 
-    struct exp {
+     struct exp {
         command *head; /* Head of the command list for an expression */
         command_list *false; /* False branch for boolean expressions */
         char last[VARLEN]; /* Last variable or value in the expression */
         char type; /* Type of the expression ('I' or 'R') */
     } expression;
 
+    struct number {
+        char value[VARLEN]; /* String representation of a numeric value */
+        char type; /* 'I' for int, 'R' for float */
+    } num;
+
+
     struct bool {
         command_list *false; /* False branch for boolean expressions */
         command *head; /* Head of the command list for boolean expressions */
     } boolean;
 
-    char id[VARLEN]; /* Identifier name */
-    char type; /* Type of a variable or expression ('I' or 'R') */
-    char op; /* Arithmetic operator (+, -, *, /) */
-    char cast_op; /* Cast operator (e.g., to int or float) */
-    command *stmt; /* Command representing a statement */
-    int relop; /* Relational operator code (e.g., <, >, ==) */
+
 }
 
-/* Type Declarations for Non-Terminals */
-%type <type> type
-%type <expression> expression term factor
-%type <boolean> boolfactor boolexpr boolterm
-%type <stmt> output_stmt assignment_stmt input_stmt stmt if_stmt break_stmt switch_stmt stmt_block while_stmt stmtlist caselist
+
 
 /* Token Declarations */
 %token <id> ID                  /* Identifier */
@@ -80,6 +83,16 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
 %token <relop> RELOP            /* Relational operators: <, >, ==, etc. */
 
 
+
+
+/* Type Declarations for Non-Terminals */
+%type <type> type
+%type <expression> expression term factor
+%type <boolean> boolfactor boolexpr boolterm
+%type <stmt> output_stmt assignment_stmt input_stmt stmt if_stmt break_stmt switch_stmt stmt_block while_stmt stmtlist caselist
+
+
+/* To solve the conflict of IF without ELSE and the ambiguity that it can create */
 %nonassoc IFX  /* Lower precedence for IF without ELSE */
 %nonassoc ELSE /* Higher precedence for IF with ELSE */
 %%
@@ -95,6 +108,7 @@ program: declarations stmt_block
     command_print($2); /* Print the generated commands */
     free_symbol_table(); /* Free the symbol table */
     free_list($2); /* Free the command list */
+    fprintf(quad, "compiled succsefully! ^-^  made by Aviel lagerev\n");
 }
 | error { yyerrok; yyclearin; } /* Recover from syntax errors at the top level */
 ;
@@ -382,11 +396,11 @@ factor: '(' expression ')'
 int yyerror(const char *err)
 {
     /*in case of critical error this can cause an infinite loop*/
-     if (strstr(err, "syntax error") != NULL || strstr(err, "end of file") != NULL) {
-         // Adding an extra message to stderr makes it clear why it's stopping
-         fprintf(stderr, "FATAL: Unrecoverable parsing error near line %d. Halting.\n", line);
-         exit(1); // Terminate the parser process immediately
-    }
+    //  if (strstr(err, "syntax error") != NULL || strstr(err, "end of file") != NULL) {
+    //      // Adding an extra message to stderr makes it clear why it's stopping
+    //      fprintf(stderr, "FATAL: Unrecoverable parsing error near line %d. Halting.\n", line);
+    //      exit(1); // Terminate the parser process immediately
+    // }
     report_error("%s\n", err);
     return 1;
 }

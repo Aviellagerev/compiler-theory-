@@ -1,25 +1,23 @@
-/* Prints all prime numbers between 2 to 38 */
-
- a, b, stop: int;
-
+x,y : int;
 {
-  output(2);
-  output(3);
-  a = 5;
+	input(x);
 
-  while(a <= 38) {
-    b = 2;
-    stop = 1;
+    y = x ;
+	switch(x){
+		case 1:
+			output(1);
+			break;
+		case 2:
+			output(2);
+			break;		
+        case 3:
+        x=x*10;
+        output(x);
+        break;
+        default:
+        output(0);
+        break;
 
-    while(b < stop*a/2) {
-       if (a/b * b==a) { stop = 0;}
-	   else { }
-       b = b + 1;
-    }
-    if (stop == 1)
-	    { output(a);}
-	else { }
-    a = a + 2;
-  }
-
+	
+	}
 }

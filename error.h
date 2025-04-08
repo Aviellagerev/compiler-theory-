@@ -12,7 +12,7 @@ void report_error(const char *format, ...);
 static const char* error_messeges[] = {
     "Error: Could not open file\n",                                   /* error_messeges[0] */
     "Usage: <program> <filename>\n",                                  /* error_messeges[1] */
-    "Parse error encountered Deleting qud file \n",                                      /* error_messeges[2] */
+    "Parse error encountered no qud file for you \n",                                      /* error_messeges[2] */
     "Invalid file extension\n"   ,                                    /* error_messeges[3] */
     "unknown variable '%s', not defined in symbol table\n",           /* error_messeges[4] */
     "invalid type\n",                                                 /*error_messeges[5] */ 

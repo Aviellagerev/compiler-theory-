@@ -55,8 +55,10 @@ int main(int argc, char* argv[]) {
         remove(input_filename); /* Remove incomplete output file */
         fclose(yyin);
         report_error(error_messeges[2]); /* "Compilation failed" */
+        fprintf(stderr, "compiler decided to give up :< \n made by Aviel lagerev\n");
     } else {
-        printf("Success ^-^\n"); /* Indicate successful compilation */
+        printf("Success ^-^\n"); 
+      
         fclose(yyin);
         fclose(quad);
     }

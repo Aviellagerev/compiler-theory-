@@ -3,19 +3,16 @@ IASN	y	x
 IEQL	var1	x	1
 JMPZ	7	var1	
 IPRT	1		
-JUMP	21		
+JUMP	17		
 IEQL	var2	x	2
 JMPZ	11	var2	
 IPRT	2		
-JUMP	21		
+JUMP	17		
 IEQL	var3	x	3
 JMPZ	16	var3	
 IMLT	x	x	10
 IPRT	x		
-JUMP	21		
-IEQL	var4	x	30
-JMPZ	20	var4	
-IPRT	8008		
-JUMP	21		
+JUMP	17		
 IPRT	0		
 HALT			
+compiled succsefully! ^-^  made by Aviel lagerev
