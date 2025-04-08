@@ -32,9 +32,9 @@ typedef char chars[CHAR];             /* Custom type for fixed-size character ar
 */
 typedef struct command {
     char com[50];         // Command name
-    char firstArg[50];    // First argument of the command
-    char secondArg[50];   // Second argument of the command
-    char thirdArg[50];    // Third argument of the command
+    char first_argument[50];    // First argument of the command
+    char second_argument[50];   // Second argument of the command
+    char third_argument[50];    // Third argument of the command
     struct command *next; // Pointer to the next command in the linked list
 } command;
 
@@ -68,9 +68,9 @@ typedef struct command_list {
    - charAddress: pointer to a character array
 */
 typedef struct {
-    char charCmd;       // Character representing the command
-    chars* charAddress; // Pointer to the character array for storage
-} charCmd;
+    char char_command;       // Character representing the command
+    chars* char_addres; // Pointer to the character array for storage
+} char_command_struct;
 
 /* Structure to hold string-based commands and their memory addresses.
    Fields:
@@ -78,9 +78,9 @@ typedef struct {
    - strAddress: pointer to a string array
 */
 typedef struct {
-    char* stringCmd;     // Pointer to the string representing the command
-    strings* strAddress; // Pointer to the string array for storage
-} strCmd;
+    char* string_command;     // Pointer to the string representing the command
+    strings* string_addres; // Pointer to the string array for storage
+} string_command_struct;
 
 /* External function to report errors with formatted output */
 extern void report_error(const char *format, ...);
