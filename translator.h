@@ -2,207 +2,252 @@
 #define TRANSLATOR_H
 
 #include <stdio.h>
-#include "symboltab.h"
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
+#include "symboltab.h"
 
-/* Constants for argument length and label count. Adjust as needed based on project requirements. */
-#define ARGLEN 100  /* Maximum length for command arguments */
-#define LABELS 100  /* Maximum number of labels allowed in the program */
+/* Constants */
+/* Maximum lengths for command arguments and labels. Adjust as needed. */
+#define ARGLEN 100  /* Max length of command arguments */
+#define LABELS 100  /* Max number of labels in the program */
 
-/* Memory allocation constants. These define sizes for various data types. Adjust as needed. */
-#define ERRLEN 100  /* Memory size reserved for error message strings */
-#define CHAR 1      /* Memory size reserved for single characters */
-#define STR 4       /* Memory size reserved for short strings */
+/* Memory allocation sizes for data types. Adjust as needed. */
+#define ERRLEN 100  /* Size for error message strings */
+#define CHAR 1      /* Size for single characters */
+#define STR 4       /* Size for short strings */
 
-/*--------------------------------------------------------------
- * Forward declarations for types used in translator.c
- *--------------------------------------------------------------*/
-extern const char* error_messeges[];  /* Array of predefined error messages used for reporting */
-typedef char strings[STR];            /* Custom type for fixed-size string arrays of length STR */
-typedef char chars[CHAR];             /* Custom type for fixed-size character arrays of length CHAR */
+/* Type Definitions */
 
-/* Command structure: represents a quad or assembly command.
-   Fields:
-   - com: stores the command name (e.g., "IADD", "JMP")
-   - firstArg, secondArg, thirdArg: hold the command’s arguments
-   - next: links to the next command in a sequence
-   (Field sizes are assumed and can be adjusted based on requirements.)
-*/
+/* Fixed-size string and character array types */
+typedef char strings[STR];    /* Array of STR characters */
+typedef char chars[CHAR];     /* Array of CHAR characters */
+
+/* Command structure: Represents a quad or assembly instruction.
+ * Fields:
+ * - com: Command name (e.g., "IADD", "JMP")
+ * - first_argument, second_argument, third_argument: Command arguments
+ * - next: Pointer to the next command in the sequence
+ */
 typedef struct command {
-    char com[50];         // Command name
-    char first_argument[50];    // First argument of the command
-    char second_argument[50];   // Second argument of the command
-    char third_argument[50];    // Third argument of the command
-    struct command *next; // Pointer to the next command in the linked list
+    char com[50];             /* Command identifier */
+    char first_argument[50];  /* First argument */
+    char second_argument[50]; /* Second argument */
+    char third_argument[50];  /* Third argument */
+    struct command *next;     /* Link to next command */
 } command;
 
-/* Enumeration for relational operations and type casts.
-   Defines symbolic constants for comparison operators and type conversions.
-*/
-enum {
-    equal,          // Represents "=="
-    notEqual,       // Represents "!="
-    bigger,         // Represents ">"
-    smaller,        // Represents "<"
-    biggerOrEqual,  // Represents ">="
-    smallerOrEqual, // Represents "<="
-    castToInt,      // Represents a cast to integer
-    castToFloat     // Represents a cast to float
-};
-
-/* Linked list of commands.
-   Fields:
-   - com: pointer to a command structure
-   - next: pointer to the next node in the list
-*/
+/* Command list structure: A linked list node for commands.
+ * Fields:
+ * - com: Pointer to a command
+ * - next: Pointer to the next node in the list
+ */
 typedef struct command_list {
-    command *com;               // Pointer to a command
-    struct command_list *next;  // Pointer to the next command list node
+    command *com;              /* Command pointer */
+    struct command_list *next; /* Next list node */
 } command_list;
 
-/* Structure to hold character-based commands and their memory addresses.
-   Fields:
-   - charCmd: single character representing the command
-   - charAddress: pointer to a character array
-*/
+/* Enumeration for relational operators and type casts */
+enum {
+    equal = 0,         /* "==" */
+    notEqual,          /* "!=" */
+    bigger,            /* ">" */
+    smaller,           /* "<" */
+    biggerOrEqual,     /* ">=" */
+    smallerOrEqual,    /* "<=" */
+    castToInt,         /* Cast to integer */
+    castToFloat        /* Cast to float */
+};
+
+/* Character command structure: Holds single-character commands.
+ * Fields:
+ * - char_command: Single character for the command
+ * - char_addres: Pointer to a character array
+ */
 typedef struct {
-    char char_command;       // Character representing the command
-    chars* char_addres; // Pointer to the character array for storage
+    char char_command;     /* Command character */
+    chars *char_addres;    /* Character array pointer */
 } char_command_struct;
 
-/* Structure to hold string-based commands and their memory addresses.
-   Fields:
-   - stringCmd: pointer to a string representing the command
-   - strAddress: pointer to a string array
-*/
+/* String command structure: Holds string-based commands.
+ * Fields:
+ * - string_command: Pointer to the command string
+ * - string_addres: Pointer to a string array
+ */
 typedef struct {
-    char* string_command;     // Pointer to the string representing the command
-    strings* string_addres; // Pointer to the string array for storage
+    char *string_command;  /* Command string */
+    strings *string_addres; /* String array pointer */
 } string_command_struct;
 
-/* External function to report errors with formatted output */
-extern void report_error(const char *format, ...);
+/* External Declarations */
+extern const char *error_messeges[]; /* Predefined error messages */
+extern void report_error(const char *format, ...); /* Error reporting function */
 
-/*--------------------------------------------------------------
- * Function prototypes from translator.c
- *--------------------------------------------------------------*/
+/* Function Prototypes */
 
-/* Merges two command lists into a single list.
-   Parameters: head (first list), tail (second list)
-   Returns: pointer to the merged list
-*/
+/**
+ * Merges two command lists into a single list.
+ * @param head First command list
+ * @param tail Second command list
+ * @return Pointer to the merged command list
+ */
 command_list* merge_comnd_list(command_list* head, command_list* tail);
 
-/* Prepends a new command to an existing command list.
-   Parameters: list (current list), com (command to add)
-   Returns: pointer to the updated list
-*/
+/**
+ * Adds a command to the start of a command list.
+ * @param list Existing command list
+ * @param com Command to prepend
+ * @return Pointer to the updated command list
+ */
 command_list* add_new_command_list(command_list* list, command* com);
 
-/* Merges two command sequences into a single sequence.
-   Parameters: head (first sequence), tail (second sequence)
-   Returns: pointer to the merged sequence
-*/
+/**
+ * Combines two command sequences into one.
+ * @param head First command sequence
+ * @param tail Second command sequence
+ * @return Pointer to the merged command sequence
+ */
 command* merege_comand(command* head, command* tail);
 
-/* Retrieves the last command in a command sequence.
-   Parameters: head (start of the sequence)
-   Returns: pointer to the last command
-*/
+/**
+ * Retrieves the last command in a sequence.
+ * @param head Start of the command sequence
+ * @return Pointer to the last command, or NULL if empty
+ */
 command* get_last_command(command* head);
 
-/* Creates a new quad command and appends it to the command sequence.
-   Parameters: head (current sequence), type (data type), com (command name),
-               firstArg, secondArg, thirdArg (command arguments)
-   Returns: pointer to the updated sequence
-*/
-command* translate_comand(command* head, char type, char* com, char* firstArg, char* secondArg, char* thirdArg);
+/**
+ * Appends a new quad command to a sequence.
+ * @param head Current command sequence
+ * @param type Data type of the command ('I' or 'R')
+ * @param com Command name (e.g., "ADD", "JMP")
+ * @param first_argument First argument
+ * @param second_argument Second argument
+ * @param third_argument Third argument
+ * @return Pointer to the updated command sequence
+ */
+command* translate_comand(command* head, char type, char* com, char* first_argument, char* second_argument, char* third_argument);
 
-/* Creates an assignment command, with error reporting for variable issues.
-   Parameters: var (variable name), exp (expression), expType (expression type),
-               expHead (expression command sequence)
-   Returns: pointer to the new command sequence
-*/
-command* add_assign_commadn(char* var, char* exp, char expType, command* expHead);
+/**
+ * Creates an assignment command with type checking.
+ * Reports errors for undefined variables or type mismatches.
+ * @param var Variable name to assign to
+ * @param exp Expression result
+ * @param expression_type Type of the expression ('I' or 'R')
+ * @param expression_head Command sequence of the expression
+ * @return Pointer to the new command sequence
+ */
+command* add_assign_commadn(char* var, char* exp, char expression_type, command* expression_head);
 
-/* Builds an arithmetic command from two command sequences.
-   Parameters: op (operator), type (result type), last (result variable),
-               firstArgLast, secondArgLast (last arguments of operands),
-               firstType, secondType (operand types), firstHead, secondHead (operand sequences)
-   Returns: pointer to the new command sequence
-*/
-command* build_arithmetic_command(char op, char type, char* last, char* firstArgLast, char* secondArgLast, char firstType, char secondType, command* firstHead, command* secondHead);
+/**
+ * Constructs an arithmetic operation command.
+ * @param op Arithmetic operator ('+', '-', '*', '/')
+ * @param type Result type ('I' or 'R')
+ * @param last Result variable name
+ * @param first_argumentLast Last argument of first operand
+ * @param second_argumentLast Last argument of second operand
+ * @param first_type Type of first operand ('I' or 'R')
+ * @param second_type Type of second operand ('I' or 'R')
+ * @param first_head First operand’s command sequence
+ * @param second_head Second operand’s command sequence
+ * @return Pointer to the new command sequence
+ */
+command* build_arithmetic_command(char op, char type, char* last, char* first_argumentLast, char* second_argumentLast, char first_type, char second_type, command* first_head, command* second_head);
 
-/* Builds a math operator command for addition, subtraction, multiplication, or division.
-   Parameters: op (operator), head (current sequence), type (data type),
-               firstArg, secondArg, thirdArg (command arguments)
-   Returns: pointer to the updated sequence
-*/
-command* build_math_operator_command(char op, command* head, char type, char* firstArg, char* secondArg, char* thirdArg);
+/**
+ * Builds a command for basic arithmetic operations.
+ * @param op Operator ('+', '-', '*', '/')
+ * @param head Current command sequence
+ * @param type Data type ('I' or 'R')
+ * @param first_argument First argument
+ * @param second_argument Second argument
+ * @param third_argument Third argument
+ * @return Pointer to the updated command sequence
+ */
+command* build_math_operator_command(char op, command* head, char type, char* first_argument, char* second_argument, char* third_argument);
 
-/* Builds a relational operator command for comparisons.
-   Parameters: relopType (type of relational operator), firstVar, secondVar (variables to compare),
-               firstHead, secondHead (operand sequences), compareType (comparison type)
-   Returns: pointer to the new command sequence
-*/
-command* build_relop_command(int relopType, char* firstVar, char* secondVar, command* firstHead, command* secondHead, char compareType);
+/**
+ * Creates a command for relational comparisons.
+ * @param relation_op_type Relational operator type (from enum)
+ * @param first_varible First variable to compare
+ * @param second_varible Second variable to compare
+ * @param first_head First operand’s command sequence
+ * @param second_head Second operand’s command sequence
+ * @param cmp_types Comparison type ('I' or 'R')
+ * @return Pointer to the new command sequence
+ */
+command* build_relop_command(int relation_op_type, char* first_varible, char* second_varible, command* first_head, command* second_head, char cmp_types);
 
-/* Flips a relational operator command (e.g., converts >= to <=).
-   Parameters: head (current sequence), lastVar (variable to adjust)
-   Returns: pointer to the updated sequence
-*/
-command* flip_command(command* head, char* lastVar);
+/**
+ * Inverts a relational operator command (e.g., > to <).
+ * @param head Current command sequence
+ * @param last_varible Variable to adjust
+ * @return Pointer to the updated command sequence
+ */
+command* flip_command(command* head, char* last_varible);
 
-/* Generates a label command and appends it to the sequence.
-   Parameters: head (current sequence)
-   Returns: pointer to the updated sequence
-*/
+/**
+ * Adds a label command to the sequence.
+ * @param head Current command sequence
+ * @return Pointer to the updated command sequence
+ */
 command* add_label(command* head);
 
-/* Converts the last argument of a command to a float operation.
-   Parameters: head (current sequence), last (variable to convert)
-   Returns: pointer to the updated sequence
-*/
+/**
+ * Converts a command’s last argument to a float.
+ * @param head Current command sequence
+ * @param last Variable to convert
+ * @return Pointer to the updated command sequence
+ */
 command* convert_to_float(command* head, char* last);
 
-/* Converts the last argument of a command to an integer operation.
-   Parameters: head (current sequence), last (variable to convert)
-   Returns: pointer to the updated sequence
-*/
+/**
+ * Converts a command’s last argument to an integer.
+ * @param head Current command sequence
+ * @param last Variable to convert
+ * @return Pointer to the updated command sequence
+ */
 command* convert_to_int(command* head, char* last);
 
-/* Determines the resulting type from two operand types.
-   Parameters: type1, type2 (types of the operands)
-   Returns: resulting type character
-*/
+/**
+ * Determines the resulting type of an operation.
+ * @param type1 First operand type ('I' or 'R')
+ * @param type2 Second operand type ('I' or 'R')
+ * @return Resulting type ('I' or 'R')
+ */
 char type_decider(char type1, char type2);
 
-/* Returns a cast code for a given cast operator.
-   Parameters: castOp (cast operator from the enum)
-   Returns: integer code for the cast
-*/
-int cast(int castOp);
+/**
+ * Maps a cast operator to its corresponding code.
+ * @param cast_operation Cast operator (from enum)
+ * @return Integer code for the cast (castToInt or castToFloat)
+ */
+int cast(int cast_operation);
 
-/* Updates a command list by renaming each command’s first argument to a label.
-   Parameters: head (command list), label (label command to use)
-*/
+/**
+ * Updates all commands in a list to reference a label.
+ * @param head Command list to update
+ * @param label Label command to reference
+ */
 void update_list_to_label(command_list* head, command* label);
 
-/* Renames the first argument of a command.
-   Parameters: com (command to modify), newArg (new argument name)
-*/
+/**
+ * Renames a command’s first argument.
+ * @param com Command to modify
+ * @param newArg New argument name
+ */
 void rename_argument(command* com, char* newArg);
 
-/* Prints all commands in the sequence to the output file (quad format).
-   Parameters: head (start of the sequence)
-*/
+/**
+ * Outputs all commands in the sequence to a quad file.
+ * @param head Start of the command sequence
+ */
 void command_print(command* head);
 
-/* Frees the entire command linked list to prevent memory leaks.
-   Parameters: head (start of the sequence)
-*/
+/**
+ * Frees the memory used by a command sequence.
+ * @param head Start of the command sequence
+ */
 void free_list(command* head);
 
 #endif /* TRANSLATOR_H */

@@ -1,9 +1,9 @@
 %{
-/* Header Section: Includes and Global Declarations */
+
 
 #include <stdio.h>
 #include <malloc.h>
-#include <stdarg.h> /* For variable argument handling in error reporting */
+#include <stdarg.h> 
 #include "error.h"
 #include "symboltab.h"
 #include "translator.h"
@@ -14,16 +14,16 @@ extern int yylex(void); /* Lexer function to get the next token */
 int yyerror(const char *s); /* Error handling function defined below */
 extern int line; /* Tracks current line number, defined in lexer */
 
-/* Global Variables Used Throughout the Parser */
+
 command_list *case_jumps = NULL; /* List of jumps for case statements in switch */
-int number = 0; /* Counter for cast operations (1 for int, 2 for float) */
-int error_number = 0; /* Counter for errors (not used in this snippet) */
+int number = 0; /* Counter for cast operations  */
+int error_number = 0; /* Counter for errors  */
 var_node *current_variable = NULL, *next_variable = NULL; /* Pointers to variables in the symbol table */
 command *current_command = NULL; /* Current command being processed */
 command_list *temp_link = NULL; /* Temporary list for linking commands */
 char *num = NULL; /* Temporary storage for numeric values */
-int p = 0; /* Counter for case values (not used in this snippet) */
-char case_val[10]; /* Array to store case values (not used in this snippet) */
+int p = 0; /* Counter for case values*/
+char case_val[10]; /* Array to store case values ) */
 extern const char* error_messeges[]; /* Array of error messages defined elsewhere */
 #define YYDEBUG 1 /* For debug */
 static int error_count = 0;
@@ -358,6 +358,7 @@ factor: '(' expression ')'
 /* Error Handling Function: Reports Parsing Errors with Line Number */
 int yyerror(const char *err)
 {
+    /*critical error*/
     if (error_count >= MAX_ERRORS) {
         report_error(error_messeges[24]);
         exit(1); /* Terminate after too many errors */

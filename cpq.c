@@ -1,14 +1,8 @@
 #include "cpq.h"
 extern int yydebug;
-/* Global Output File Pointer */
+
 FILE* quad = NULL; /* Output file pointer for quad commands, initialized to NULL */
 
-/* Main entry point for the CPQ compiler.
-   Processes command-line arguments, opens input/output files, and invokes the parser.
-   Returns:
-   - 1 on successful compilation
-   - 0 on failure (e.g., invalid arguments, file errors, or parsing errors)
-*/
 int main(int argc, char* argv[]) {
     char* input_filename;  /* Name of the input file */
     char* extension;       /* Pointer to the file extension */
@@ -66,13 +60,7 @@ int main(int argc, char* argv[]) {
     return 1; /* Successful execution */
 }
 
-/* Opens a file with the specified name and mode.
-   Parameters:
-   - name: The filename to open
-   - type: The mode ("r" for read, "w" for write, etc.)
-   Returns:
-   - Pointer to the opened FILE object, or NULL on failure
-*/
+
 FILE* openFile(char* name, char* type) {
     FILE* file = fopen(name, type);
     if (file == NULL) {

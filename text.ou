@@ -1,30 +1,28 @@
-   /* should print 3  8   16.0   17.0  18.0 (or 19.0 if RTOI rounds up) */    
- a, b : float;
- i, j : int;
+/*convert from decimal to binary */
+
+a , b : int;
+ temp, ten:int;
 
 {
-   a = 3.2;
-   j = 8;
-   
-   i = cast<int>(a);
-   output(i);
-   
-   i = cast<int> (j);
-   output(i);
-   
-   i = 16;
-   a = cast<float>(i);
-   output(a);
-   
-   b = 17.0;
-   
-   a = cast<float>(b);
-   
-   output(a);
-   
-   b = 18.9;
-   a = cast<int> (b);
-   
-   output(a);
 
-}
+    b = 0;
+
+    while (b == 0) {
+       input (a);
+       if(a > 0 && a <= 1000) 
+	       b = 1;
+       else { }
+    }
+
+    ten = 1;
+    b = 0;
+
+    while (a > 0) {
+        temp = a-a/2*2;
+        b = b + temp * ten;
+        ten = ten * 10;
+        a = a / 2;
+    }
+    output(b);
+
+ }
