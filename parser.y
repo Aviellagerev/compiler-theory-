@@ -15,11 +15,7 @@ int yyerror(const char *s); /* Error handling function defined below */
 extern int line; /* Tracks current line number, defined in lexer */
 
 /* Global Variables Used Throughout the Parser */
-/*im sure this can be removed or changed to make this better*/
 command_list *case_jumps = NULL; /* List of jumps for case statements in switch */
-/*future me: cant figure it out i lied */
-/*double future me  i lied twice cant be done */
-
 int number = 0; /* Counter for cast operations (1 for int, 2 for float) */
 int error_number = 0; /* Counter for errors (not used in this snippet) */
 var_node *current_variable = NULL, *next_variable = NULL; /* Pointers to variables in the symbol table */
@@ -29,9 +25,9 @@ char *num = NULL; /* Temporary storage for numeric values */
 int p = 0; /* Counter for case values (not used in this snippet) */
 char case_val[10]; /* Array to store case values (not used in this snippet) */
 extern const char* error_messeges[]; /* Array of error messages defined elsewhere */
- #define YYDEBUG 1/* for debug*/
-
- 
+#define YYDEBUG 1 /* For debug */
+static int error_count = 0;
+const int MAX_ERRORS = 4; /* Limit the number of error messages */
 %}
 
 %debug 
@@ -41,14 +37,14 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
 /* Union Definition: Specifies Types for Semantic Values */
 %union
 {
-        char id[VARLEN]; /* Identifier name */
+    char id[VARLEN]; /* Identifier name */
     char type; /* Type of a variable or expression ('I' or 'R') */
     char op; /* Arithmetic operator (+, -, *, /) */
     char cast_op; /* Cast operator (e.g., to int or float) */
     command *stmt; /* Command representing a statement */
     int relop; /* Relational operator code (e.g., <, >, ==) */
 
-     struct exp {
+    struct exp {
         command *head; /* Head of the command list for an expression */
         command_list *false; /* False branch for boolean expressions */
         char last[VARLEN]; /* Last variable or value in the expression */
@@ -60,16 +56,11 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
         char type; /* 'I' for int, 'R' for float */
     } num;
 
-
     struct bool {
         command_list *false; /* False branch for boolean expressions */
         command *head; /* Head of the command list for boolean expressions */
     } boolean;
-
-
 }
-
-
 
 /* Token Declarations */
 %token <id> ID                  /* Identifier */
@@ -82,33 +73,28 @@ extern const char* error_messeges[]; /* Array of error messages defined elsewher
 %token OR AND NOT               /* Logical operators */
 %token <relop> RELOP            /* Relational operators: <, >, ==, etc. */
 
-
-
-
 /* Type Declarations for Non-Terminals */
 %type <type> type
 %type <expression> expression term factor
 %type <boolean> boolfactor boolexpr boolterm
 %type <stmt> output_stmt assignment_stmt input_stmt stmt if_stmt break_stmt switch_stmt stmt_block while_stmt stmtlist caselist
 
-
 /* To solve the conflict of IF without ELSE and the ambiguity that it can create */
 %nonassoc IFX  /* Lower precedence for IF without ELSE */
 %nonassoc ELSE /* Higher precedence for IF with ELSE */
+
 %%
 
 /* Grammar Rules and Actions */
 
-/* Program: Top-Level Rule Representing the Entire Program
-   - Consists of declarations followed by a statement block.
-   - Translates the block into commands, prints them, and frees resources. */
+/* Program: Top-Level Rule Representing the Entire Program */
 program: declarations stmt_block
 {
     $2 = translate_comand($2, 'H', "ALT", "", "", ""); /* Add a halt command */
     command_print($2); /* Print the generated commands */
     free_symbol_table(); /* Free the symbol table */
     free_list($2); /* Free the command list */
-    fprintf(quad, "compiled succsefully! ^-^  made by Aviel lagerev\n");
+    fprintf(quad, "compiled successfully! ^-^ made by Aviel lagerev\n");
 }
 | error { yyerrok; yyclearin; } /* Recover from syntax errors at the top level */
 ;
@@ -118,8 +104,7 @@ declarations: declarations declaration
 | /* epsilon */ /* Allows for no declarations */
 ;
 
-/* Declaration: Declares a List of Identifiers with a Type
-   - Sets the type for all identifiers in the symbol table. */
+/* Declaration: Declares a List of Identifiers with a Type */
 declaration: idlist ':' type { set_variable_type($3); } ';'
 | idlist ':' error { report_error(error_messeges[5]); yyerrok; yyclearin; } /* Missing type */
 ;
@@ -146,11 +131,10 @@ stmt: assignment_stmt { $$ = $1; }
 | stmt_block { $$ = $1; }
 | ID { report_error(error_messeges[7], $1); $$ = NULL; } /* Lone ID is invalid */
 | NUM { report_error(error_messeges[8], $1.value); $$ = NULL; } /* Lone number is invalid */
-| error { yyerrok; yyclearin; $$ = NULL; } /* General error recovery */
+| error ';' { report_error(error_messeges[16]); yyerrok; $$ = NULL; } /* Error recovery for statements */
 ;
 
-/* Assignment_stmt: Assigns an Expression's Value to a Variable
-   - Generates an assignment command with type checking. */
+/* Assignment_stmt: Assigns an Expression's Value to a Variable */
 assignment_stmt: ID '=' expression ';'
 {
     $$ = add_assign_commadn($1, $3.last, $3.type, $3.head);
@@ -158,8 +142,7 @@ assignment_stmt: ID '=' expression ';'
 | ID '=' expression { report_error(error_messeges[9]); $$ = NULL; } /* Missing semicolon */
 ;
 
-/* Input_stmt: Reads Input into a Variable
-   - Checks if the variable exists and generates an input command. */
+/* Input_stmt: Reads Input into a Variable */
 input_stmt: INPUT '(' ID ')' ';'
 {
     $$ = NULL;
@@ -171,8 +154,7 @@ input_stmt: INPUT '(' ID ')' ';'
 | INPUT '(' ID ')' { report_error(error_messeges[10]); $$ = NULL; } /* Missing semicolon */
 ;
 
-/* Output_stmt: Outputs the Result of an Expression
-   - Generates a print command and frees temporary variables. */
+/* Output_stmt: Outputs the Result of an Expression */
 output_stmt: OUTPUT '(' expression ')' ';'
 {
     $$ = translate_comand($3.head, $3.type, "PRT", $3.last, "", "");
@@ -181,21 +163,19 @@ output_stmt: OUTPUT '(' expression ')' ';'
 | OUTPUT '(' expression ')' { report_error(error_messeges[10]); $$ = NULL; } /* Missing semicolon */
 ;
 
-/* If_stmt: Implements If-Else Logic with Jumps and Labels
-   - Manages control flow for conditional execution. */
-   if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
-         {
-             /* This is the CORRECT rule for if-else */
-             $$ = merege_comand($3.head, $5); /* Merge condition and then-branch */
-             $$ = translate_comand($$, 'J', "UMP", "", "", ""); /* Jump to end after then */
-             temp_link = add_new_command_list(NULL, get_last_command($$)); /* Link to end */
-             $$ = add_label($$); /* Label after then (start of else) */
-             update_list_to_label($3.false, get_last_command($$)); /* False jumps to else */
-             $$ = merege_comand($$, $7); /* Merge else-branch */
-             $$ = add_label($$); /* Label at end */
-             update_list_to_label(temp_link, get_last_command($$)); /* Jump from end of 'then' to end */
-         }
-      | IF '(' boolexpr ')' stmt %prec IFX
+/* If_stmt: Implements If-Else Logic with Jumps and Labels */
+if_stmt: IF '(' boolexpr ')' stmt ELSE stmt
+{
+    $$ = merege_comand($3.head, $5); /* Merge condition and then-branch */
+    $$ = translate_comand($$, 'J', "UMP", "", "", ""); /* Jump to end after then */
+    temp_link = add_new_command_list(NULL, get_last_command($$)); /* Link to end */
+    $$ = add_label($$); /* Label after then (start of else) */
+    update_list_to_label($3.false, get_last_command($$)); /* False jumps to else */
+    $$ = merege_comand($$, $7); /* Merge else-branch */
+    $$ = add_label($$); /* Label at end */
+    update_list_to_label(temp_link, get_last_command($$)); /* Jump from end of 'then' to end */
+}
+| IF '(' boolexpr ')' stmt %prec IFX
 {
     report_error(error_messeges[23]);
     $$ = NULL;
@@ -203,12 +183,7 @@ output_stmt: OUTPUT '(' expression ')' ';'
 | IF '(' error ')' stmt ELSE stmt { report_error(error_messeges[12]); yyerrok; yyclearin; $$ = NULL; }
 ;
 
-
-      
-
-
-/* While_stmt: Implements a While Loop with Jumps and Labels
-   - Loops back to the condition if true, exits if false. */
+/* While_stmt: Implements a While Loop with Jumps and Labels */
 while_stmt: WHILE '(' boolexpr ')' stmt
 {
     $$ = add_label(NULL); /* Start label */
@@ -223,8 +198,7 @@ while_stmt: WHILE '(' boolexpr ')' stmt
 | WHILE '(' error ')' stmt { report_error(error_messeges[13]); yyerrok; yyclearin; $$ = NULL; }
 ;
 
-/* Switch_stmt: Implements a Switch Statement with Cases and Default
-   - Evaluates the expression and jumps to matching cases or default. */
+/* Switch_stmt: Implements a Switch Statement with Cases and Default */
 switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 {
     next_variable = add_temp_var(current_variable ? current_variable->type : 'I'); /* Temp var for comparison */
@@ -245,8 +219,7 @@ switch_stmt: SWITCH '(' expression ')' '{' caselist DEFAULT ':' stmtlist '}'
 }
 ;
 
-/* Caselist: A List of Case Statements in a Switch
-   - Compares the switch expression and jumps accordingly. */
+/* Caselist: A List of Case Statements in a Switch */
 caselist: caselist CASE NUM ':' stmtlist
 {
     num = $1 ? $3.value : $3.value; /* Store case value */
@@ -263,32 +236,22 @@ caselist: caselist CASE NUM ':' stmtlist
 | /* empty */ { $$ = NULL; case_jumps = NULL; } /* No cases */
 ;
 
-/* Break_stmt: Handles Break Statements
-   - Currently does nothing; may need a jump to the end of a loop/switch. */
+/* Break_stmt: Handles Break Statements */
 break_stmt: BREAK ';' { $$ = NULL; }
 | BREAK { report_error(error_messeges[15]); $$ = NULL; } /* Missing semicolon */
 ;
 
-/* Stmt_block: A Block of Statements Enclosed in Braces
-   - Simplified to avoid shift/reduce conflicts; errors handled in stmtlist. */
+/* Stmt_block: A Block of Statements Enclosed in Braces */
 stmt_block: '{' stmtlist '}' { $$ = $2; }
+          | '{' stmtlist error { report_error(error_messeges[16]); $$ = NULL; }
 ;
-
-/* Stmtlist: A List of Statements
-   - Enhanced error recovery with semicolon synchronization. */
+/* Stmtlist: A List of Statements */
 stmtlist: stmtlist stmt { $$ = merege_comand($1, $2); }
-| stmtlist error ';' 
-{ 
-    report_error(error_messeges[16]); /* "Syntax error in statement list" */
-    yyerrok; 
-    yyclearin; 
-    $$ = $1; 
-}
 | /* empty */ { $$ = NULL; }
+
 ;
 
-/* Boolexpr: Handles Boolean Expressions with OR Operations
-   - Short-circuits evaluation using jumps. */
+/* Boolexpr: Handles Boolean Expressions with OR Operations */
 boolexpr: boolexpr OR boolterm
 {
     $$.head = translate_comand($1.head, 'J', "UMP", "", "", ""); /* Jump if true */
@@ -395,12 +358,12 @@ factor: '(' expression ')'
 /* Error Handling Function: Reports Parsing Errors with Line Number */
 int yyerror(const char *err)
 {
-    /*in case of critical error this can cause an infinite loop*/
-    //  if (strstr(err, "syntax error") != NULL || strstr(err, "end of file") != NULL) {
-    //      // Adding an extra message to stderr makes it clear why it's stopping
-    //      fprintf(stderr, "FATAL: Unrecoverable parsing error near line %d. Halting.\n", line);
-    //      exit(1); // Terminate the parser process immediately
-    // }
+    if (error_count >= MAX_ERRORS) {
+        report_error(error_messeges[24]);
+        exit(1); /* Terminate after too many errors */
+    }
+
+    error_count++;
     report_error("%s\n", err);
     return 1;
 }

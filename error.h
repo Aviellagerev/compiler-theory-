@@ -33,7 +33,8 @@ static const char* error_messeges[] = {
     "Identifier '%.*s...' exceeds maximum length of %d characters\n", /*error_messeges[20] */
     "Unknown token '%s'\n",                                            /*error_messeges[21] */ 
     "Error: Memory allocation failed for new command\n",
-    "Missing ELSE clause in if statement\n"                                              /*error_messeges[23] */
+    "Missing ELSE clause in if statement\n",                                              /*error_messeges[23] */
+    "Somthing went wrong grammer in loop exiting program \n"
     
 };
 #endif

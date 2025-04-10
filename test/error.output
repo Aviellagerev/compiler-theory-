@@ -1,7 +1,7 @@
-ERROR: line 9: Missing ELSE clause in if statement
-ERROR: line 10: cast from float to int ERROR!
-ERROR: line 12: missing semicolon after assignment
-ERROR: line 16: missing DEFAULT in switch statement
+ERROR: line 10: Missing ELSE clause in if statement
+ERROR: line 11: cast from float to int ERROR!
+ERROR: line 13: missing semicolon after assignment
+ERROR: line 17: missing DEFAULT in switch statement
 ERROR: Parse error encountered no qud file for you 
 compiler decided to give up :< 
  made by Aviel lagerev

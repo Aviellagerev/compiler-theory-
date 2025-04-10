@@ -1,18 +1,18 @@
-IINP	x		
-IASN	y	x	 
-IEQL	var1	x	1
-JMPZ	7	var1	
-IPRT	1		
-JUMP	17		
-IEQL	var2	x	2
-JMPZ	11	var2	
-IPRT	2		
-JUMP	17		
-IEQL	var3	x	3
-JMPZ	16	var3	
-IMLT	x	x	10
-IPRT	x		
-JUMP	17		
-IPRT	0		
+RASN	a	3.2	 
+IASN	j	8	 
+RTOI	i	a	 
+IPRT	i		
+IASN	i	j	 
+IPRT	i		
+IASN	i	16	 
+ITOR	a	i	 
+RPRT	a		
+RASN	b	17.0	 
+RASN	a	b	 
+RPRT	a		
+RASN	b	18.9	 
+RTOI	var1	b	 
+ITOR	a	var1	 
+RPRT	a		
 HALT			
-compiled succsefully! ^-^  made by Aviel lagerev
+compiled successfully! ^-^ made by Aviel lagerev
